@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 23.0.3, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 536.3 800" style="enable-background:new 0 0 536.3 800;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill-rule:evenodd;clip-rule:evenodd;fill:#19BCFE;}
+	.st1{fill-rule:evenodd;clip-rule:evenodd;fill:#09CF83;}
+	.st2{fill-rule:evenodd;clip-rule:evenodd;fill:#A259FF;}
+	.st3{fill-rule:evenodd;clip-rule:evenodd;fill:#F24E1E;}
+	.st4{fill-rule:evenodd;clip-rule:evenodd;fill:#FF7262;}
+</style>
+<g transform="translate(4)">
+	<circle class="st0" cx="399" cy="400" r="133.3"/>
+	<path class="st1" d="M132.3,800c73.6,0,133.3-59.7,133.3-133.3c0-20.1,0-64.5,0-133.3c-59.9,0-104.3,0-133.3,0
+		C58.7,533.3-1,593-1,666.7S58.7,800,132.3,800z"/>
+	<path class="st2" d="M132.3,533.3c24.5,0,69,0,133.3,0V266.7c-64.3,0-108.8,0-133.3,0C58.7,266.7-1,326.4-1,400
+		S58.7,533.3,132.3,533.3z"/>
+	<path class="st3" d="M132.3,266.7c24.5,0,69,0,133.3,0V0c-64.3,0-108.8,0-133.3,0C58.7,0-1,59.7-1,133.3S58.7,266.7,132.3,266.7z"
+		/>
+	<path class="st4" d="M399,266.7H265.7l0,0V0H399l0,0c73.6,0,133.3,59.7,133.3,133.3S472.6,266.7,399,266.7z"/>
+</g>
+</svg>
