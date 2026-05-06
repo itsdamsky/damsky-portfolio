@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Adam Maulana | Web Developer",
+  title: "Adam Maulana — Portfolio",
   description: "Personal portfolio website",
 };
 
