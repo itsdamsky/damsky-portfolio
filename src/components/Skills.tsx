@@ -4,13 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 const skills = [
-  { name: "Figma", level: 90, icon: "/images/skills/fgm.svg", scale: "scale-110" },
-  { name: "Photoshop", level: 85, icon: "/images/skills/psd.svg", scale: "scale-95" },
-  { name: "Illustrator", level: 85, icon: "/images/skills/ai.svg", scale: "scale-95" },
-  { name: "HTML", level: 90, icon: "/images/skills/html.svg", scale: "scale-100" },
-  { name: "CSS", level: 85, icon: "/images/skills/css.svg", scale: "scale-100" },
-  { name: "JavaScript", level: 75, icon: "/images/skills/js.svg", scale: "scale-95" },
-  { name: "React", level: 70, icon: "/images/skills/rct.svg", scale: "scale-110" },
+  { name: "Figma", level: 90, icon: "/images/Skills/fgm.svg", scale: "scale-110" },
+  { name: "Photoshop", level: 85, icon: "/images/Skills/psd.svg", scale: "scale-95" },
+  { name: "Illustrator", level: 85, icon: "/images/Skills/ai.svg", scale: "scale-95" },
+  { name: "HTML", level: 90, icon: "/images/Skills/html.svg", scale: "scale-100" },
+  { name: "CSS", level: 85, icon: "/images/Skills/css.svg", scale: "scale-100" },
+  { name: "JavaScript", level: 75, icon: "/images/Skills/js.svg", scale: "scale-95" },
+  { name: "React", level: 70, icon: "/images/Skills/rct.svg", scale: "scale-110" },
 ];
 
 export default function Skills() {
