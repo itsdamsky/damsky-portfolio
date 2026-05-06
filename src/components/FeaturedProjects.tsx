@@ -8,17 +8,17 @@ export default function FeaturedProjects() {
     {
       title: "Industrial Solutions Website",
       category: "Web Design & Development",
-      image: "/images/featuredprojects/Afrakonektra.png",
+      image: "/images/featuredprojects/Afrakonektra.PNG",
     },
     {
       title: "Custom Box Packaging Platform",
       category: "Web Design & Development",
-      image: "/images/featuredprojects/Customboxid.png",
+      image: "/images/featuredprojects/Customboxid.PNG",
     },
     {
       title: "Business Brokerage Website",
       category: "Corporate Website",
-      image: "/images/featuredprojects/Jembatanbisnis.png",
+      image: "/images/featuredprojects/Jembatanbisnis.PNG",
     },
   ];
 
