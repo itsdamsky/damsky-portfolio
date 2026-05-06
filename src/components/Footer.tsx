@@ -39,7 +39,7 @@ export default function Footer() {
           <div>
             <a href="/">
             <img
-              src="/images/navbar/logo-A.svg"
+              src="/images/navbar/Logo-A.svg"
               alt="Adam Logo"
               className="h-8 w-auto mb-6"
             />
