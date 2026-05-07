@@ -36,7 +36,7 @@ export default function MouseLight() {
   return (
     <div
       className="fixed inset-0 z-[2] pointer-events-none 
-      bg-[radial-gradient(circle_300px_at_var(--mouse-x)_var(--mouse-y),rgba(255,95,0,0.10),transparent_60%)]"
+      bg-[radial-gradient(circle_450px_at_var(--mouse-x)_var(--mouse-y),rgba(255,95,0,0.35),transparent_85%)]"
     />
   );
 }
