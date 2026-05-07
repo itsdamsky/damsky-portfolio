@@ -40,7 +40,7 @@ export default function FeaturedProjects() {
             </h2>
           </div>
 
-          <button className="text-sm text-orange-500 flex items-center gap-2 hover:opacity-80 transition">
+          <button className="text-sm text-orange-500 flex items-center gap-2 hover:opacity-80 transition cursor-pointer will-change-transform">
             View All Projects <span>↗</span>
           </button>
 
