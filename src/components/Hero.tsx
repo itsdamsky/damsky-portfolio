@@ -227,7 +227,7 @@ export default function Hero() {
               shadow-[0_10px_40px_rgba(0,0,0,0.4)]">
 
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-orange-600 rounded-full flex items-center justify-center text-lg">
+                <div className="w-14 h-14 bg-orange-500 rounded-full flex items-center justify-center text-lg">
                   👤
                 </div>
                 <div>
