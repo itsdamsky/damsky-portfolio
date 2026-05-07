@@ -127,7 +127,7 @@ export default function Hero() {
               👋
             </p>
 
-            <h1 className="text-4xl md:text-6xl font-bold leading-[1.1]">
+            <h1 className="text-3xl md:text-6xl font-bold leading-[1.1]">
 
               {/* BARIS 1 */}
               <div className="text-white inline-block">
