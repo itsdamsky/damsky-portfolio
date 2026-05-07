@@ -194,18 +194,18 @@ export default function Hero() {
           {/* RIGHT */}
           <div className="relative flex justify-center">
             {/* 🔥 BACK GLOW (DITAMBAH POWER) */}
-            <div className="absolute w-[600px] h-[600px] bg-orange-500/25 blur-[180px] rounded-full z-0" />
+            <div className="absolute w-[600px] h-[600px] bg-orange-600/25 blur-[180px] rounded-full z-0" />
 
-            <div className="absolute w-[450px] h-[450px] bg-orange-500/35 blur-[140px] rounded-full z-0" />
+            <div className="absolute w-[450px] h-[450px] bg-orange-600/35 blur-[140px] rounded-full z-0" />
 
-            <div className="absolute w-[300px] h-[300px] bg-orange-500/70 blur-[90px] rounded-full z-0" />
+            <div className="absolute w-[300px] h-[300px] bg-orange-600/70 blur-[90px] rounded-full z-0" />
 
             {/* 🔥 INNER GLOW (BIAR CENTER NYALA) */}
-            <div className="absolute w-[200px] h-[200px] bg-orange-400/80 blur-[60px] rounded-full z-0" />
+            <div className="absolute w-[200px] h-[200px] bg-orange-500/80 blur-[60px] rounded-full z-0" />
 
             {/* 🔥 CIRCLE OUTLINE (LEBIH TAJAM & GLOW) */}
             <div className="absolute w-[420px] h-[420px] rounded-full z-10
-              border-2 border-orange-400/80
+              border-2 border-orange-500/80
               shadow-[0_0_25px_rgba(255,140,0,0.6),0_0_60px_rgba(255,120,0,0.25)]
             " />
 
@@ -227,7 +227,7 @@ export default function Hero() {
               shadow-[0_10px_40px_rgba(0,0,0,0.4)]">
 
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-orange-500 rounded-full flex items-center justify-center text-lg">
+                <div className="w-14 h-14 bg-orange-600 rounded-full flex items-center justify-center text-lg">
                   👤
                 </div>
                 <div>
