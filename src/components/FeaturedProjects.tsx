@@ -47,7 +47,7 @@ export default function FeaturedProjects() {
         </div>
 
         {/* CARDS */}
-        <div className="grid md:grid-cols-3 gap-6 cursor-pointer will-change-transform hover:shadow-[0_0_40px_rgba(255,115,0,0.25">
+        <div className="will-change-transform grid md:grid-cols-3 gap-6 cursor-pointer will-change-transform hover:shadow-[0_0_40px_rgba(255,115,0,0.25">
 
           {projects.map((project, i) => (
             <div

@@ -92,7 +92,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative w-full h-[calc(100vh-90px)] flex items-center text-white overflow-hidden scroll-mt-[70px]"
+      className="relative will-change-transform w-full h-[calc(100vh-90px)] flex items-center text-white overflow-hidden scroll-mt-[70px]"
     >
 
       {/* GLOW */}
@@ -115,7 +115,7 @@ export default function Hero() {
       </div>
 
       <div className="container-custom relative z-10 w-full">
-        <div className="grid lg:grid-cols-2 items-center gap-10">
+        <div className="grid lg:grid-cols-[1.2fr_1fr] items-center gap-10">
 
           {/* LEFT */}
           <div>
@@ -127,10 +127,10 @@ export default function Hero() {
               👋
             </p>
 
-            <h1 className="text-3xl md:text-6xl font-bold leading-[1.1]">
+            <h1 className="text-4xl md:text-6xl font-bold leading-[1.1]">
 
               {/* BARIS 1 */}
-              <div className="text-white inline-block">
+              <div className="text-white">
                 {display1}
 
                 {/* cursor di atas */}
@@ -140,21 +140,22 @@ export default function Hero() {
               </div>
 
               {/* BARIS 2 */}
-              <div className="inline-block bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
+              {display2 && (
+                <div className="inline-block bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
 
-                {display2}
+                  {display2}
 
-                {/* cursor pindah ke bawah */}
-                {display2.length > 0 && (
-                  <span className="inline-block ml-1 w-[3px] h-[1em] bg-orange-500 animate-pulse align-bottom" />
-                )}
+                  {/* cursor pindah ke bawah */}
+                  {display2.length > 0 && (
+                    <span className="inline-block ml-1 w-[3px] h-[1em] bg-orange-500 animate-pulse align-bottom" />
+                  )}
 
-              </div>
+                </div>
+              )}
 
             </h1>
 
-
-            <p className="text-gray-400 mt-6 max-w-lg leading-relaxed">
+            <p className="text-gray-400 flex flex-col gap-6 max-w-lg leading-relaxed mt-6">
               I create visually stunning designs and build modern,
               responsive websites that help brands stand out and achieve their goals.
             </p>

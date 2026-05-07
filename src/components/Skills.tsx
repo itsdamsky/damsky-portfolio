@@ -53,7 +53,7 @@ export default function Skills() {
   };
 
   return (
-    <section className="relative py-24 overflow-hidden">
+    <section className="relative will-change-transform py-24 overflow-hidden">
       <div className="container-custom">
 
         {/* HEADER */}

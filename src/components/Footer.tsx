@@ -2,13 +2,13 @@
 
 export default function Footer() {
   return (
-    <footer className="relative mt-2 overflow-hidden border-t border-white/5">
+    <footer className="will-change-transform relative mt-2 overflow-hidden border-t border-white/5">
 
       {/* 🔥 CTA */}
       <div className="relative pt-24 pb-20 text-center overflow-hidden">
 
         {/* 🔥 SUNRISE GLOW */}
-        <div className="absolute bottom-[-170px] left-1/2 -translate-x-1/2 w-[1000px] h-[190px] bg-[radial-gradient(ellipse_at_center,rgba(255,120,0,0.65)_60%,rgba(255,120,0,0.3)_65%,rgba(255,120,0,0.1)_85%,transparent_100%)] blur-[60px] pointer-events-none" />
+        <div className="absolute bottom-[-170px] left-1/2 -translate-x-1/2 w-[1000px] h-[190px] bg-[radial-gradient(ellipse_at_center,rgba(255,95,0,0.95)_60%,rgba(255,95,0,0.55)_65%,rgba(255,95,0,0.20)_85%,transparent_100%)] blur-[60px] pointer-events-none" />
 
         <p className="relative z-[2] text-[11px] tracking-[4px] text-orange-600 mb-6">
           LET’S WORK TOGETHER
@@ -135,7 +135,10 @@ export default function Footer() {
                     />
                   </a>
 
-                  <a href="#">
+                  <a href="https://github.com/itsdamsky"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <img
                       src="/images/footer/github.svg"
                       alt="GitHub"
@@ -152,10 +155,10 @@ export default function Footer() {
       </div>
 
       {/* 🔥 DIVIDER */}
-      <div className="border-t border-white/10 mx-12 bg-black pt-5"/>
+      <div className="border-t border-white/10 mx-12 bg-black pt-2"/>
 
       {/* 🔥 BOTTOM */}
-      <div className="bg-black pb-5">
+      <div className="bg-black pb-2">
 
         <div className="container-custom py-6 flex items-center justify-center text-xs text-gray-500">
 

@@ -21,7 +21,7 @@ export default function Navbar() {
               className="h-10 w-auto"
             />
 
-            <p className="text-white font-semibold text-lg">
+            <p className="text-white font-semibold text-md">
               Maulana
             </p>
 

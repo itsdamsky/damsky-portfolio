@@ -8,7 +8,7 @@ export default function About() {
     <section className="relative text-white py-24 overflow-hidden" id="about">
 
       {/* 🔥 TOP FADE (INI YANG KAMU BUTUH) */}
-        <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-black to-transparent z-10" />
+        <div className="will-change-transform absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-black to-transparent z-10" />
 
       <div className="container-custom">
         <div className="grid lg:grid-cols-2 gap-16 items-center">

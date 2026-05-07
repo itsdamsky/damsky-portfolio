@@ -4,6 +4,8 @@ import "./globals.css";
 import MouseLight from "@/components/MouseLight";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SmoothScroll from "@/components/SmoothScroll";
+import PageLoader from "@/components/PageLoader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,6 +33,10 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="bg-black text-white relative">
+
+        <PageLoader />
+
+        <SmoothScroll />
 
         {/* GRID */}
         <div
