@@ -210,15 +210,20 @@ export default function Hero() {
               shadow-[0_0_25px_rgba(255,140,0,0.6),0_0_60px_rgba(255,120,0,0.25)]
             " />
 
-            <div className="relative z-10 -translate-y-20">
+            <div className="relative z-10 -translate-y-20 flex justify-center items-center">
               <Image
                 src="/images/hero/photome.png"
                 alt="profile"
                 width={520}
                 height={620}
-                className="object-contain scale-110 
-                drop-shadow-[0_0_25px_rgba(255,120,0,0.35)]
-                drop-shadow-[0_0_60px_rgba(255,120,0,0.15)]"
+                className="
+                  object-contain
+                  max-h-[70vh]
+                  w-auto
+                  scale-110
+                  drop-shadow-[0_0_25px_rgba(255,120,0,0.35)]
+                  drop-shadow-[0_0_60px_rgba(255,120,0,0.15)]
+                "
               />
             </div>
 
