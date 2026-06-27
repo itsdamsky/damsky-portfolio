@@ -1,0 +1,127 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+  --mouse-x: 0px;
+  --mouse-y: 0px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ffffff;
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translate(0px, 0px);
+    opacity: 0.6;
+  }
+  25% {
+    transform: translate(10px, -15px);
+  }
+  50% {
+    transform: translate(-5px, -25px);
+    opacity: 1;
+  }
+  75% {
+    transform: translate(15px, -10px);
+  }
+  100% {
+    transform: translate(0px, 0px);
+    opacity: 0.6;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #000;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+:focus-visible {
+  outline: 2px solid rgba(249, 115, 22, 0.9);
+  outline-offset: 3px;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid rgba(249, 115, 22, 0.9);
+  outline-offset: 3px;
+}
+
+.container-custom {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+@media (min-width: 1280px) {
+  .container-custom {
+    padding-inline: 2rem;
+  }
+}
+
+html,
+body {
+  overflow-x: hidden;
+}
+
+/* Optimize animations on mobile */
+@media (max-width: 768px) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    * {
+      animation-duration: inherit !important;
+      animation-iteration-count: inherit !important;
+      transition-duration: inherit !important;
+    }
+  }
+}
+
+a:focus {
+  outline: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
