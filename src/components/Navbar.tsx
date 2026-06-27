@@ -17,7 +17,6 @@ export default function Navbar() {
   const [headerVisible, setHeaderVisible] = useState(true);
   const [lastScroll, setLastScroll] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [mounted, setMounted] = useState(false);
   const [navWidth, setNavWidth] = useState(0);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const navRef = useRef<HTMLDivElement>(null);
@@ -49,7 +48,6 @@ export default function Navbar() {
     { href: "mailto:adammaulana.design@gmail.com", label: "Contact", icon: Phone },
   ];
 
-  // detect active index dari pathname
   useEffect(() => {
     if (pathname === "/") {
       setActiveIndex(0);
@@ -62,7 +60,6 @@ export default function Navbar() {
     setActiveIndex(index !== -1 ? index : 0);
   }, [pathname]);
 
-  // measure nav width
   useEffect(() => {
     if (!navRef.current) return;
     const ro = new ResizeObserver(() => {
@@ -89,24 +86,18 @@ export default function Navbar() {
     }
   };
 
-  // snap saat active index atau nav width berubah
   useEffect(() => {
     const timer = setTimeout(() => snapToIndex(activeIndex, true), 300);
     return () => clearTimeout(timer);
-  }, [activeIndex, navWidth]);
-
-  // mount effect — hanya sekali
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  }, [activeIndex, navWidth, scrolled]);
 
   const findNearestIndex = (currentX: number) => {
     const nav = navRef.current;
     if (!nav) return activeIndex;
-    const navRect = nav.getBoundingClientRect();
     const pillCenter = currentX + pillWidth.get() / 2;
     let nearest = 0;
     let minDist = Infinity;
+    const navRect = nav.getBoundingClientRect();
     itemRefs.current.forEach((el, i) => {
       if (!el) return;
       const rect = el.getBoundingClientRect();
@@ -181,8 +172,14 @@ export default function Navbar() {
       {/* ===== MOBILE HEADER ATAS ===== */}
       <motion.header
         className="md:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 py-4"
-        animate={{ opacity: headerVisible ? 1 : 0, y: headerVisible ? 0 : -20 }}
-        transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+        animate={{
+          opacity: scrolled ? 0 : 1,
+          y: scrolled ? -20 : 0,
+        }}
+        transition={{
+          duration: 0.4,
+          ease: [0.25, 0.46, 0.45, 0.94],
+        }}
       >
         <Link href="/" className="flex items-center gap-1.5">
           <img src="/images/navbar/Logo-A.svg" alt="logo" className="h-7 w-7 object-contain" />
@@ -200,9 +197,13 @@ export default function Navbar() {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, ease: [0.33, 1, 0.68, 1] }}
       >
-        <div
+        <motion.div
           ref={navRef}
-          className="relative flex items-center justify-around w-full max-w-xs rounded-full px-1.5 py-1.5 border border-white/[0.12] select-none"
+          animate={{
+            width: scrolled ? "280px" : "380px",
+          }}
+          transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className="relative flex items-center justify-around rounded-full py-2 px-1.5 border border-white/[0.12] select-none"
           style={{
             background: "rgba(18,18,18,0.78)",
             backdropFilter: "blur(30px)",
@@ -282,64 +283,16 @@ export default function Navbar() {
                   }}
                   whileTap={{ scale: 0.85 }}
                   transition={{ duration: 0.25, ease: "easeOut" }}
-                  className="flex items-center justify-center px-3.5 py-2.5 rounded-full text-white"
+                  className="flex items-center justify-center rounded-full text-white"
+                  style={{ padding: scrolled ? "8px 10px" : "10px 14px" }}
                 >
-                  <Icon size={20} />
+                  <Icon size={scrolled ? 17 : 20} />
                 </motion.button>
               </div>
             );
           })}
-        </div>
+        </motion.div>
       </motion.div>
     </>
-  );
-}
-
-function MobileNavIcon({
-  icon: Icon,
-  pillX,
-  pillWidth,
-  itemRef,
-  navRef,
-  onTap,
-}: {
-  icon: React.ElementType;
-  pillX: any;
-  pillWidth: any;
-  itemRef: HTMLDivElement | null;
-  navRef: React.RefObject<HTMLDivElement | null>;
-  onTap: () => void;
-}) {
-  const opacity = useMotionValue(0.45);
-  const scale = useMotionValue(1);
-  const y = useMotionValue(0);
-
-  useEffect(() => {
-    const unsubX = pillX.on("change", (px: number) => {
-      if (!itemRef || !navRef.current) return;
-      const navRect = navRef.current.getBoundingClientRect();
-      const itemRect = itemRef.getBoundingClientRect();
-      const itemCenter = itemRect.left - navRect.left + itemRect.width / 2;
-      const pillCenter = px + pillWidth.get() / 2;
-      const dist = Math.abs(pillCenter - itemCenter);
-      const maxDist = 60;
-      const proximity = Math.max(0, 1 - dist / maxDist);
-      opacity.set(0.45 + proximity * 0.55);
-      scale.set(1 + proximity * 0.08);
-      y.set(-proximity * 2);
-    });
-    return () => unsubX();
-  }, [itemRef, pillX, pillWidth]);
-
-  return (
-    <motion.button
-      onClick={onTap}
-      style={{ opacity, scale, y }}
-      whileTap={{ scale: 0.85 }}
-      transition={{ duration: 0.25, ease: "easeOut" }}
-      className="flex items-center justify-center px-3.5 py-2.5 rounded-full text-white"
-    >
-      <Icon size={20} />
-    </motion.button>
   );
 }
