@@ -171,7 +171,7 @@ export default function Navbar() {
 
       {/* ===== MOBILE HEADER ATAS ===== */}
       <motion.header
-        className="md:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 py-4"
+        className="md:hidden fixed top-0 left-0 right-0 z-502 flex items-center justify-between px-5 py-4"
         animate={{
           opacity: scrolled ? 0 : 1,
           y: scrolled ? -20 : 0,
@@ -225,8 +225,7 @@ export default function Navbar() {
               top: 6,
               height: "calc(100% - 12px)",
               borderRadius: 9999,
-              background: "rgba(255,255,255,0.14)",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1)",
+              background: "transparent",
               cursor: "grab",
               zIndex: 10,
             }}
