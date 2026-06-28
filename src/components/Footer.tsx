@@ -19,7 +19,9 @@ export default function Footer() {
         </h2>
 
         <a
-          href="mailto:adammaulana.design@gmail.com"
+          href="https://wa.me/6281299491922?text=Halo%20Adam%2C%20saya%20melihat%20portfolio%20kamu%20dan%20tertarik%20untuk%20bekerja%20sama!"
+          target="_blank"
+          rel="noopener noreferrer"
           className="relative z-[2] mt-10 inline-flex items-center justify-center px-7 py-3 rounded-xl border border-orange-500/40 bg-black/40 backdrop-blur-md hover:bg-orange-500/10 transition cursor-pointer will-change-transform hover:shadow-[0_0_40px_rgba(255,115,0,0.25)]"
         >
           Get in touch <span className="text-orange-500 ml-1">↗</span>
@@ -44,21 +46,20 @@ export default function Footer() {
             </Link>
 
             <p className="text-white mb-2 text-[15px]">Adam Maulana</p>
-            <p className="text-gray-400 text-sm mb-6">Graphic Designer & Web Developer</p>
+            <p className="text-gray-400 text-sm mb-6">Frontend Developer & Graphic Designer</p>
             <p className="text-gray-500 text-sm leading-relaxed max-w-[320px]">
-              I design and build digital experiences that are clean,
-              functional and user-focused.
+              Building brand-driven, responsive web experiences — from Figma to production code.
             </p>
           </div>
 
           <div>
             <p className="text-orange-500 text-xs tracking-[3px] mb-6">LINKS</p>
             <div className="flex flex-col gap-4 text-sm text-gray-400">
-              <a href="#home">Home</a>
-              <a href="#about">About</a>
-              <a href="#projects">Projects</a>
-              <a href="#skills">Skills</a>
-              <a href="mailto:adammaulana.design@gmail.com">Contact</a>
+              <a href="/">Home</a>
+              <a href="/about">About</a>
+              <a href="/projects">Projects</a>
+              <a href="/skills">Skills</a>
+              <a href="/contact">Contact</a>
             </div>
           </div>
 
@@ -84,7 +85,7 @@ export default function Footer() {
                 <p className="text-orange-500 text-xs tracking-[3px] mb-4">FOLLOW ME</p>
                 <div className="flex gap-5 flex-wrap">
                   <a
-                    href="https://www.instagram.com/amaulana.09?igsh=MWN0dnl2bmxxM3BpMg%3D%3D&utm_source=qr"
+                    href="https://www.instagram.com/amaulana.09"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -96,15 +97,6 @@ export default function Footer() {
                       className="brightness-0 invert opacity-70 hover:opacity-100 transition"
                     />
                   </a>
-                  <span className="opacity-70 transition" aria-hidden="true">
-                    <Image
-                      src="/images/footer/dribbble.svg"
-                      alt="Dribbble"
-                      width={20}
-                      height={20}
-                      className="brightness-0 invert opacity-70 hover:opacity-100 transition"
-                    />
-                  </span>
                   <a
                     href="https://www.linkedin.com/in/adammaulana-dev/"
                     target="_blank"

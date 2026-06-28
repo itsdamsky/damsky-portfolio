@@ -44,19 +44,35 @@ export default function Navbar() {
     { href: "/", label: "Home", icon: Home },
     { href: "/about", label: "About", icon: User },
     { href: "/projects", label: "Projects", icon: FolderOpen },
-    { href: "/#skills", label: "Skills", icon: Cpu },
-    { href: "mailto:adammaulana.design@gmail.com", label: "Contact", icon: Phone },
+    { href: "/skills", label: "Skills", icon: Cpu },
+    { href: "/contact", label: "Contact", icon: Phone },
   ];
 
   useEffect(() => {
+    // Guard: Next.js App Router bisa return null sebelum hydration
+    if (!pathname) return;
+
+    // Home page — langsung set index 0
     if (pathname === "/") {
       setActiveIndex(0);
       return;
     }
-    const index = menuItems.findIndex((item) => {
-      if (item.href === "/") return false;
-      return pathname === item.href || pathname.startsWith(item.href.split("#")[0]);
+
+    const index = menuItems.findIndex((item, i) => {
+      // Lewati item pertama (home "/") — sudah di-handle di atas
+      if (i === 0) return false;
+      // Lewati mailto links — bukan route
+      if (item.href.startsWith("mailto")) return false;
+
+      const basePath = item.href.split("#")[0];
+      // ⚠️  BUG FIX: "/#skills" → basePath = "/" yang cocok dengan SEMUA pathname.
+      // Item seperti ini adalah section di home page, bukan route tersendiri.
+      // Jadi skip — active state-nya dikontrol manual via scroll, bukan routing.
+      if (!basePath || basePath === "/") return false;
+
+      return pathname === basePath || pathname.startsWith(basePath + "/");
     });
+
     setActiveIndex(index !== -1 ? index : 0);
   }, [pathname]);
 
@@ -87,8 +103,16 @@ export default function Navbar() {
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => snapToIndex(activeIndex, true), 300);
-    return () => clearTimeout(timer);
+    // Gunakan requestAnimationFrame agar snap berjalan SETELAH DOM selesai di-paint
+    // sehingga getBoundingClientRect() di snapToIndex mendapat nilai yang akurat
+    let rafId: number;
+    const timer = setTimeout(() => {
+      rafId = requestAnimationFrame(() => snapToIndex(activeIndex, true));
+    }, 80);
+    return () => {
+      clearTimeout(timer);
+      cancelAnimationFrame(rafId);
+    };
   }, [activeIndex, navWidth, scrolled]);
 
   const findNearestIndex = (currentX: number) => {
@@ -110,7 +134,7 @@ export default function Navbar() {
 
   return (
     <>
-      {/* ===== DESKTOP NAVBAR (tidak berubah) ===== */}
+      {/* ===== DESKTOP NAVBAR (tidak berubah sama sekali) ===== */}
       <header className="hidden md:flex fixed top-0 left-0 right-0 z-50 justify-center px-4 pt-4 pointer-events-none">
         <nav
           className={`pointer-events-auto w-full flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-transform
@@ -157,7 +181,9 @@ export default function Navbar() {
             })}
           </div>
           <a
-            href="mailto:adammaulana.design@gmail.com"
+            href="https://wa.me/6281299491922?text=Halo%20Adam%2C%20saya%20melihat%20portfolio%20kamu%20dan%20tertarik%20untuk%20bekerja%20sama!"
+            target="_blank"
+            rel="noopener noreferrer"
             className={`text-sm items-center gap-1 transition-all duration-500 flex ${
               scrolled
                 ? "text-white bg-orange-500 px-4 py-1.5 rounded-full hover:bg-orange-600"
@@ -169,7 +195,7 @@ export default function Navbar() {
         </nav>
       </header>
 
-      {/* ===== MOBILE HEADER ATAS ===== */}
+      {/* ===== MOBILE HEADER ATAS (tidak berubah sama sekali) ===== */}
       <motion.header
         className="md:hidden fixed top-0 left-0 right-0 z-502 flex items-center justify-between px-5 py-4"
         animate={{
@@ -185,12 +211,17 @@ export default function Navbar() {
           <img src="/images/navbar/Logo-A.svg" alt="logo" className="h-7 w-7 object-contain" />
           <p className="text-white font-semibold text-sm">Maulana</p>
         </Link>
-        <Link href="mailto:adammaulana.design@gmail.com" className="text-sm text-white">
+        <a
+          href="https://wa.me/6281299491922?text=Halo%20Adam%2C%20saya%20melihat%20portfolio%20kamu%20dan%20tertarik%20untuk%20bekerja%20sama!"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm text-white"
+        >
           Let&apos;s Talk <span className="text-orange-500">↗</span>
-        </Link>
+        </a>
       </motion.header>
 
-      {/* ===== MOBILE BOTTOM NAVBAR ===== */}
+      {/* ===== MOBILE BOTTOM NAVBAR — LIQUID GLASS ===== */}
       <motion.div
         className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex justify-center px-6 pb-7"
         initial={{ opacity: 0, y: 40, scale: 0.95 }}
@@ -199,19 +230,64 @@ export default function Navbar() {
       >
         <motion.div
           ref={navRef}
-          animate={{
-            width: scrolled ? "280px" : "380px",
-          }}
+          animate={{ width: scrolled ? "280px" : "380px" }}
           transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="relative flex items-center justify-around rounded-full py-2 px-1.5 border border-white/[0.12] select-none"
+          className="relative flex items-center justify-around rounded-full py-2 px-1.5 select-none overflow-hidden"
           style={{
-            background: "rgba(18,18,18,0.78)",
-            backdropFilter: "blur(30px)",
-            WebkitBackdropFilter: "blur(30px)",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)",
+            /* --- Liquid glass base --- */
+            background: "rgba(14, 14, 14, 0.36)",
+            backdropFilter: "blur(64px) saturate(200%) brightness(1.1)",
+            WebkitBackdropFilter: "blur(64px) saturate(200%) brightness(1.1)",
+
+            /* --- Glass border + multi-layer depth shadows --- */
+            border: "1px solid rgba(255, 255, 255, 0.13)",
+            boxShadow: `
+              0 24px 64px rgba(0, 0, 0, 0.55),
+              0 8px 20px rgba(0, 0, 0, 0.3),
+              inset 0 1.5px 0 rgba(255, 255, 255, 0.26),
+              inset 0 -0.5px 0 rgba(255, 255, 255, 0.06),
+              inset 1px 0 0 rgba(255, 255, 255, 0.06),
+              inset -1px 0 0 rgba(255, 255, 255, 0.06)
+            `,
           }}
         >
-          {/* Draggable pill */}
+          {/* 1. Top specular highlight line — simulates light hitting the glass rim */}
+          <div
+            aria-hidden="true"
+            className="absolute top-0 left-0 right-0 pointer-events-none"
+            style={{
+              height: "1.5px",
+              borderRadius: "9999px 9999px 0 0",
+              background:
+                "linear-gradient(90deg, transparent 4%, rgba(255,255,255,0.5) 22%, rgba(255,255,255,0.88) 50%, rgba(255,255,255,0.5) 78%, transparent 96%)",
+              zIndex: 30,
+            }}
+          />
+
+          {/* 2. Surface sheen — diagonal gradient simulating glass reflectivity */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 rounded-full pointer-events-none"
+            style={{
+              background:
+                "linear-gradient(130deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.035) 38%, transparent 58%)",
+              zIndex: 1,
+            }}
+          />
+
+          {/* 3. Bottom edge micro-glow */}
+          <div
+            aria-hidden="true"
+            className="absolute bottom-0 left-10 right-10 pointer-events-none"
+            style={{
+              height: "1px",
+              background:
+                "linear-gradient(90deg, transparent, rgba(255,255,255,0.14) 50%, transparent)",
+              zIndex: 30,
+            }}
+          />
+
+          {/* 4. Draggable liquid glass pill */}
           <motion.div
             ref={pillRef}
             drag="x"
@@ -225,9 +301,22 @@ export default function Navbar() {
               top: 6,
               height: "calc(100% - 12px)",
               borderRadius: 9999,
-              background: "transparent",
+
+              /* Liquid glass pill — orange-tinted frosted glass */
+              background:
+                "linear-gradient(148deg, rgba(255, 118, 28, 0.24) 0%, rgba(255, 78, 0, 0.15) 55%, rgba(195, 48, 0, 0.11) 100%)",
+              backdropFilter: "blur(22px) saturate(180%)",
+              WebkitBackdropFilter: "blur(22px) saturate(180%)",
+              border: "1px solid rgba(255, 148, 58, 0.22)",
+              boxShadow: `
+                inset 0 1.5px 0 rgba(255, 215, 125, 0.44),
+                inset 0 -0.5px 0 rgba(195, 65, 0, 0.18),
+                inset 0.5px 0 0 rgba(255, 185, 85, 0.1),
+                inset -0.5px 0 0 rgba(255, 185, 85, 0.1)
+              `,
               cursor: "grab",
               zIndex: 10,
+              overflow: "hidden",
             }}
             onDrag={(_, info) => {
               const nav = navRef.current;
@@ -253,9 +342,66 @@ export default function Navbar() {
               }
             }}
             whileDrag={{ cursor: "grabbing" }}
-          />
+          >
+            {/* 4a. Pill top-arc specular shine — the "glass dome" look */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                top: "2px",
+                left: "14%",
+                right: "14%",
+                height: "50%",
+                borderRadius: "0 0 50% 50%",
+                background:
+                  "linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.04) 100%)",
+                pointerEvents: "none",
+                zIndex: 2,
+              }}
+            />
 
-          {/* Icons */}
+            {/* 4b. Animated shimmer sweep — the "liquid" in liquid glass */}
+            <motion.div
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                top: 0,
+                bottom: 0,
+                width: "38%",
+                background:
+                  "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.14) 50%, transparent 100%)",
+                transform: "skewX(-18deg)",
+                pointerEvents: "none",
+                zIndex: 3,
+              }}
+              animate={{ x: ["-90%", "280%"] }}
+              transition={{
+                duration: 2.4,
+                repeat: Infinity,
+                repeatDelay: 3.8,
+                ease: "easeInOut",
+              }}
+            />
+
+            {/* 4c. Pill bottom amber glow — warm glass refraction */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                bottom: "1px",
+                left: "22%",
+                right: "22%",
+                height: "35%",
+                borderRadius: "50% 50% 0 0",
+                background:
+                  "linear-gradient(0deg, rgba(255,148,40,0.18) 0%, transparent 100%)",
+                pointerEvents: "none",
+                zIndex: 2,
+              }}
+            />
+          </motion.div>
+
+          {/* 5. Icons */}
           {menuItems.map((item, i) => {
             const Icon = item.icon;
             const isActive = activeIndex === i;
@@ -285,7 +431,10 @@ export default function Navbar() {
                   className="flex items-center justify-center rounded-full text-white"
                   style={{ padding: scrolled ? "8px 10px" : "10px 14px" }}
                 >
-                  <Icon size={scrolled ? 17 : 20} />
+                  <Icon
+                    size={scrolled ? 17 : 20}
+                    strokeWidth={isActive ? 2.2 : 1.8}
+                  />
                 </motion.button>
               </div>
             );

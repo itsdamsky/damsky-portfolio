@@ -145,6 +145,27 @@ export default function About() {
               </div>
             </div>
 
+            {/* Certifications */}
+            <p className="text-xs tracking-[3px] text-orange-500 mt-10 mb-6">CERTIFICATIONS</p>
+            <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-5 hover:border-orange-500/40 transition duration-300">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-white font-medium text-sm">#JuaraVibeCoding — Certificate of Completion</p>
+                  <p className="text-orange-500 text-xs mt-0.5">Google Developer Groups</p>
+                  <p className="text-neutral-500 text-xs mt-1">Vibe Coding Study Jam · Participant</p>
+                </div>
+                <span className="text-neutral-500 text-xs shrink-0">May 2026</span>
+              </div>
+              <a
+                href="https://drive.google.com/file/d/1zQ0mkv2xgOJUOMoXHj8Yms_y043f3i3V/view?usp=sharing"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-orange-500 hover:text-orange-400 transition mt-3"
+              >
+                Verify Certificate ↗
+              </a>
+            </div>
+
           </div>
         </div>
       </div>

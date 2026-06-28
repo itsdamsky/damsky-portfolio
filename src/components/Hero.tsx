@@ -171,7 +171,7 @@ export default function Hero() {
               <button className="flex-1 max-w-[160px] px-4 py-3 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg text-sm font-medium hover:scale-105 transition cursor-pointer will-change-transform">
                 View My Work ↗
               </button>
-              <a href="/files/cv-adam.pdf" download
+              <a href="/files/Adam-Maulana-CV.pdf" download
                 className="flex-1 max-w-[160px] px-4 py-3 rounded-xl border border-orange-500/40 bg-black/40 backdrop-blur-md hover:bg-orange-500/10 transition text-center text-sm">
                 Download CV ↓
               </a>
