@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
 const stats = [
   { value: "5+", label: "Years in Design" },
@@ -84,12 +85,12 @@ export default function About() {
 
             {/* CTA */}
             <div className="flex items-center gap-4">
-              <a
-                href="#projects"
-                className="text-sm text-white border border-white/20 px-5 py-2.5 rounded-full hover:border-orange-500 hover:text-orange-500 transition-all duration-300"
-              >
-                View My Work →
-              </a>
+              <Link
+                    href="/projects"
+                    className="text-sm text-white border border-white/20 px-5 py-2.5 rounded-full hover:border-orange-500 hover:text-orange-500 transition-all duration-300"
+                  >
+                    View My Work ↗
+                  </Link>
               <a
                 href="/cv/Adam_Maulana_CV.pdf"
                 download

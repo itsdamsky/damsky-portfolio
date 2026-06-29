@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import Counter from "@/components/Counter";
+import Link from "next/link";
 
 type Dot = {
   top: number;
@@ -168,9 +169,12 @@ export default function Hero() {
               that help brands stand out and achieve their goals.
             </p>
             <div className="flex gap-3 justify-center mb-6">
-              <button className="flex-1 max-w-[160px] px-4 py-3 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg text-sm font-medium hover:scale-105 transition cursor-pointer will-change-transform">
+              <Link
+                href="/projects"
+                className="flex-1 max-w-[160px] px-4 py-3 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg text-sm font-medium hover:scale-105 transition text-center will-change-transform"
+              >
                 View My Work ↗
-              </button>
+              </Link>
               <a href="/files/Adam-Maulana-CV.pdf" download
                 className="flex-1 max-w-[160px] px-4 py-3 rounded-xl border border-orange-500/40 bg-black/40 backdrop-blur-md hover:bg-orange-500/10 transition text-center text-sm">
                 Download CV ↓
@@ -276,9 +280,12 @@ export default function Hero() {
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 mt-8">
-                  <button className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg font-medium hover:scale-105 transition cursor-pointer will-change-transform hover:shadow-[0_0_40px_rgba(255,115,0,0.25)]">
+                  <Link
+                    href="/projects"
+                    className="flex-1 max-w-[160px] px-4 py-3 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg text-sm font-medium hover:scale-105 transition text-center will-change-transform"
+                  >
                     View My Work ↗
-                  </button>
+                  </Link>
                   <a href="/files/cv-adam.pdf" download
                     className="w-full sm:w-auto px-6 py-3 rounded-xl border border-orange-500/40 bg-black/40 backdrop-blur-md hover:bg-orange-500/10 transition text-center">
                     Download CV ↓
@@ -326,7 +333,7 @@ export default function Hero() {
                     </div>
                     <div className="w-full h-px bg-white/10 md:w-[1px] md:h-12 md:bg-white/10" />
                     <div>
-                      <p className="text-2xl font-medium text-white"><Counter target={30} suffix="+" /></p>
+                      <p className="text-2xl font-medium text-white"><Counter target={10} suffix="+" /></p>
                       <p className="text-sm text-gray-400">Projects Completed</p>
                     </div>
                   </div>
@@ -341,7 +348,7 @@ export default function Hero() {
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-5xl px-6 z-20">
           <p className="text-center text-[10px] tracking-[3px] text-gray-500 mb-6">TOOLS I USE</p>
           <div className="flex justify-center items-center gap-10 flex-wrap">
-            {["/images/tools/figma.svg","/images/tools/photoshop.svg","/images/tools/illustrator.svg","/images/tools/corel.svg","/images/tools/vscode.svg","/images/tools/react.svg","/images/tools/nextdotjs.svg","/images/tools/tailwindcss.svg"].map((src, i) => (
+            {["/images/tools/figma.svg","/images/tools/photoshop.svg","/images/tools/illustrator.svg","/images/tools/vscode.svg","/images/Skills/wordpress.svg","/images/tools/react.svg","/images/tools/nextdotjs.svg","/images/tools/tailwindcss.svg"].map((src, i) => (
               <div key={i} className="group relative flex items-center justify-center">
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition blur-xl bg-orange-500/20 rounded-full" />
                 <Image src={src} alt="tool" width={50} height={50} loading="lazy" className="relative z-10 opacity-40 grayscale invert group-hover:opacity-100 group-hover:scale-110 transition duration-300" />

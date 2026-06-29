@@ -125,3 +125,12 @@ a:focus {
   background: transparent !important;
   box-shadow: none !important;
 }
+
+#nprogress .bar {
+  background: #f97316 !important; /* orange-500 */
+  height: 2px !important;
+}
+
+#nprogress .peg {
+  box-shadow: 0 0 10px #f97316, 0 0 5px #f97316 !important;
+}

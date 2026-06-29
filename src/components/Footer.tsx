@@ -35,7 +35,7 @@ export default function Footer() {
       <div className="pt-10 pb-10 bg-black">
         <div className="container-custom grid grid-cols-1 gap-10 md:grid-cols-4">
           <div>
-            <Link href="/">
+            <Link href="/" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
               <Image
                 src="/images/navbar/Logo-A.svg"
                 alt="Adam Maulana logo"

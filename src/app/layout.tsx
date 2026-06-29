@@ -6,6 +6,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SmoothScroll from "@/components/SmoothScroll";
 import PageLoader from "@/components/PageLoader";
+import TopLoader from "@/components/TopLoader";       // ← tambah
+import PageWrapper from "@/components/PageWrapper";   // ← tambah
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,29 +41,24 @@ export default function RootLayout({
       </head>
       <body className="bg-black text-white relative">
 
+        <TopLoader />       {/* ← tambah di sini */}
         <PageLoader />
-
         <SmoothScroll />
 
-        {/* GRID - optimized for mobile */}
-        <div
-          className="fixed inset-0 z-[1] pointer-events-none opacity-[0.35] bg-[linear-gradient(to_right,rgba(255,255,255,0.15)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.15)_1px,transparent_1px)] bg-[size:60px_60px] hidden md:block"
-        />
+        <div className="fixed inset-0 z-[1] pointer-events-none opacity-[0.35] bg-[linear-gradient(to_right,rgba(255,255,255,0.15)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.15)_1px,transparent_1px)] bg-[size:60px_60px] hidden md:block" />
 
-        {/* MOUSE LIGHT */}
         <MouseLight />
 
-        {/* CONTENT */}
         <div className="relative z-[10] flex flex-col min-h-screen">
-
           <Navbar />
 
           <main className="flex-1">
-            {children}
+            <PageWrapper>   {/* ← wrap children */}
+              {children}
+            </PageWrapper>
           </main>
 
           <Footer />
-
         </div>
 
       </body>

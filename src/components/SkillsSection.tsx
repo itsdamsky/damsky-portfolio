@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import ScrollReveal from "@/components/ScrollReveal";
+import { motion, AnimatePresence } from "framer-motion";
 
 const categories = [
   {
@@ -33,9 +35,9 @@ const categories = [
     color: "from-purple-500/20 to-transparent",
     accent: "bg-purple-500",
     skills: [
-        { name: "WordPress", level: 85, icon: "/images/skills/wordpress.svg" },
-        { name: "Git / GitHub", level: 70, icon: "", github: true },
-        { name: "VS Code", level: 90, icon: "/images/skills/vscode.svg" },
+      { name: "WordPress", level: 85, icon: "/images/skills/wordpress.svg" },
+      { name: "Git / GitHub", level: 70, icon: "", github: true },
+      { name: "VS Code", level: 90, icon: "/images/skills/vscode.svg" },
     ],
   },
 ];
@@ -56,6 +58,12 @@ export default function SkillsSection() {
   const [show, setShow] = useState(false);
   const [activeCategory, setActiveCategory] = useState(0);
 
+  const handleCategoryChange = (i: number) => {
+    setActiveCategory(i);
+    setShow(false);
+    setTimeout(() => setShow(true), 50);
+  };
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) setShow(true); },
@@ -67,84 +75,88 @@ export default function SkillsSection() {
 
   return (
     <section className="relative min-h-screen py-32 overflow-hidden">
-      {/* Background glow */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-orange-500/5 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="container-custom">
-        {/* Header */}
-        <div className="mb-16">
-          <p className="text-xs tracking-[3px] text-orange-500 mb-3">MY STACK</p>
-          <h1 className="text-4xl md:text-5xl font-semibold text-white mb-4">
-            Skills & Tools
-          </h1>
-          <p className="text-neutral-400 max-w-xl">
-            A mix of design craft and frontend engineering — built over 5+ years of hands-on work.
-          </p>
-        </div>
+        <ScrollReveal>
+          <div className="mb-16">
+            <p className="text-xs tracking-[3px] text-orange-500 mb-3">MY STACK</p>
+            <h1 className="text-4xl md:text-5xl font-semibold text-white mb-4">Skills & Tools</h1>
+            <p className="text-neutral-400 max-w-xl">
+              A mix of design craft and frontend engineering — built over 5+ years of hands-on work.
+            </p>
+          </div>
+        </ScrollReveal>
 
-        {/* Category tabs */}
-        <div className="flex gap-2 mb-12 flex-wrap">
-          {categories.map((cat, i) => (
-            <button
-              key={i}
-              onClick={() => setActiveCategory(i)}
-              className={`text-xs px-4 py-2 rounded-full border transition-all duration-300 cursor-pointer ${
-                activeCategory === i
-                  ? "border-orange-500 text-orange-500 bg-orange-500/10"
-                  : "border-white/10 text-neutral-400 hover:border-white/30 hover:text-white"
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
+        <ScrollReveal delay={0.1}>
+          <div className="flex gap-2 mb-12 flex-wrap">
+            {categories.map((cat, i) => (
+              <button
+                key={i}
+                onClick={() => handleCategoryChange(i)}
+                className={`text-xs px-4 py-2 rounded-full border transition-all duration-300 cursor-pointer ${
+                  activeCategory === i
+                    ? "border-orange-500 text-orange-500 bg-orange-500/10"
+                    : "border-white/10 text-neutral-400 hover:border-white/30 hover:text-white"
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+        </ScrollReveal>
 
-        {/* Skills grid */}
-        <div ref={ref} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {categories[activeCategory].skills.map((skill, i) => (
-            <div
-              key={i}
-              className={`group relative bg-white/5 border border-white/10 rounded-2xl p-5 hover:border-orange-500/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(255,115,0,0.08)]
-                ${show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}
-              `}
-              style={{ transitionDelay: `${i * 80}ms` }}
-            >
-              {/* Glow on hover */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-orange-500/5 to-transparent rounded-2xl pointer-events-none" />
-
-              <div className="relative z-10 flex items-center gap-4 mb-4">
-                <div className="w-10 h-10 flex items-center justify-center shrink-0 bg-white/5 rounded-xl border border-white/10">
-                    {"github" in skill && skill.github ? (
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
-                        </svg>
-                    ) : (
-                        <Image
-                        src={skill.icon}
-                        alt={skill.name}
-                        width={24}
-                        height={24}
-                        className={`w-6 h-6 object-contain ${"invert" in skill && skill.invert ? "brightness-0 invert" : ""}`}
+        <div ref={ref}>
+          <AnimatePresence mode="wait">
+            <div key={activeCategory} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {categories[activeCategory].skills.map((skill, i) => (
+                <motion.div
+                  key={skill.name}
+                  initial={{ opacity: 0, y: 32, filter: "blur(6px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  transition={{
+                    duration: 0.55,
+                    delay: i * 0.12,
+                    ease: [0.25, 0.1, 0.25, 1],
+                  }}
+                >
+                  <div className="group relative bg-white/5 border border-white/10 rounded-2xl p-5 hover:border-orange-500/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(255,115,0,0.08)]">
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-orange-500/5 to-transparent rounded-2xl pointer-events-none" />
+                    <div className="relative z-10 flex items-center gap-4 mb-4">
+                      <div className="w-10 h-10 flex items-center justify-center shrink-0 bg-white/5 rounded-xl border border-white/10">
+                        {"github" in skill && skill.github ? (
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
+                          </svg>
+                        ) : (
+                          <Image
+                            src={skill.icon}
+                            alt={skill.name}
+                            width={24}
+                            height={24}
+                            className={`w-6 h-6 object-contain ${"invert" in skill && skill.invert ? "brightness-0 invert" : ""}`}
+                          />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-sm text-white font-medium">{skill.name}</p>
+                          <p className="text-xs text-neutral-500">{skill.level}%</p>
+                        </div>
+                        <SkillBar
+                          level={skill.level}
+                          accent={categories[activeCategory].accent}
+                          show={show}
                         />
-                    )}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-sm text-white font-medium">{skill.name}</p>
-                    <p className="text-xs text-neutral-500">{skill.level}%</p>
+                      </div>
+                    </div>
                   </div>
-                  <SkillBar
-                    level={skill.level}
-                    accent={categories[activeCategory].accent}
-                    show={show}
-                  />
-                </div>
-              </div>
+                </motion.div>
+              ))}
             </div>
-          ))}
+          </AnimatePresence>
         </div>
 
-        {/* Summary stats */}
         <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { value: "5+", label: "Years in Design" },
@@ -152,10 +164,12 @@ export default function SkillsSection() {
             { value: "10+", label: "Tools Mastered" },
             { value: "4", label: "Projects Shipped" },
           ].map((stat, i) => (
-            <div key={i} className="bg-white/5 border border-white/10 rounded-2xl px-5 py-5 text-center hover:border-orange-500/30 transition-all duration-300">
-              <p className="text-2xl font-bold text-orange-500 mb-1">{stat.value}</p>
-              <p className="text-xs text-neutral-400">{stat.label}</p>
-            </div>
+            <ScrollReveal key={i} delay={i * 0.08}>
+              <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-5 text-center hover:border-orange-500/30 transition-all duration-300">
+                <p className="text-2xl font-bold text-orange-500 mb-1">{stat.value}</p>
+                <p className="text-xs text-neutral-400">{stat.label}</p>
+              </div>
+            </ScrollReveal>
           ))}
         </div>
       </div>
