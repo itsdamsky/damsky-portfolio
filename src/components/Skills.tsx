@@ -23,7 +23,7 @@ const skills: Skill[] = [
   { name: "JavaScript", level: 60, icon: "/images/Skills/js.svg", scale: "scale-95" },
   { name: "React", level: 55, icon: "/images/Skills/rct.svg", scale: "scale-110" },
   { name: "Next.js", level: 55, icon: "/images/Skills/nextdotjs.svg", scale: "scale-95" },
-  { name: "Tailwind", level: 70, icon: "/images/Skills/tailwindcss.svg", scale: "scale-110", invert: true },
+  { name: "Tailwind", level: 70, icon: "/images/tools/tailwindcss.svg", scale: "scale-110", invert: true },
   { name: "WordPress", level: 85, icon: "/images/Skills/wordpress.svg", scale: "scale-95" },
   { name: "VS Code", level: 90, icon: "/images/Skills/vscode.svg", scale: "scale-95" },
   { name: "Git / GitHub", level: 70, icon: "", scale: "scale-95", github: true },
