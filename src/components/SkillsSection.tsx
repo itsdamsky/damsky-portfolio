@@ -14,7 +14,7 @@ const categories = [
       { name: "Figma", level: 60, icon: "/images/Skills/fgm.svg" },
       { name: "Photoshop", level: 90, icon: "/images/Skills/psd.svg" },
       { name: "Illustrator", level: 85, icon: "/images/Skills/ai.svg" },
-      { name: "CorelDRAW", level: 85, icon: "/images/skills/coreldraw.svg" },
+      { name: "CorelDRAW", level: 85, icon: "/images/Skills/coreldraw.svg" },
     ],
   },
   {
@@ -26,7 +26,7 @@ const categories = [
       { name: "CSS", level: 80, icon: "/images/Skills/css.svg" },
       { name: "JavaScript", level: 60, icon: "/images/Skills/js.svg" },
       { name: "React", level: 55, icon: "/images/Skills/rct.svg" },
-      { name: "Next.js", level: 55, icon: "/images/skills/nextdotjs.svg" },
+      { name: "Next.js", level: 55, icon: "/images/Skills/nextdotjs.svg" },
       { name: "Tailwind CSS", level: 70, icon: "/images/tools/tailwindcss.svg", invert: true },
     ],
   },
@@ -35,9 +35,9 @@ const categories = [
     color: "from-purple-500/20 to-transparent",
     accent: "bg-purple-500",
     skills: [
-      { name: "WordPress", level: 85, icon: "/images/skills/wordpress.svg" },
+      { name: "WordPress", level: 85, icon: "/images/Skills/wordpress.svg" },
       { name: "Git / GitHub", level: 70, icon: "", github: true },
-      { name: "VS Code", level: 90, icon: "/images/skills/vscode.svg" },
+      { name: "VS Code", level: 90, icon: "/images/Skills/vscode.svg" },
     ],
   },
 ];

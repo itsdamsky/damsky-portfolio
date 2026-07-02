@@ -136,7 +136,7 @@ const projects: Project[] = [
   },
   {
     title: "Tag Mango",
-    category: "Custombox Indonesia",
+    category: "Freelance",
     year: "2023",
     desc: "Product tag design for Mango branded packaging.",
     tags: ["Print Design", "Tag Design", "Packaging"],

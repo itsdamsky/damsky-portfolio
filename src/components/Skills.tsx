@@ -16,16 +16,16 @@ type Skill = {
 const skills: Skill[] = [
   { name: "Photoshop", level: 90, icon: "/images/Skills/psd.svg", scale: "scale-95" },
   { name: "Illustrator", level: 85, icon: "/images/Skills/ai.svg", scale: "scale-95" },
-  { name: "CorelDRAW", level: 85, icon: "/images/skills/coreldraw.svg", scale: "scale-95" },
+  { name: "CorelDRAW", level: 85, icon: "/images/Skills/coreldraw.svg", scale: "scale-95" },
   { name: "Figma", level: 60, icon: "/images/Skills/fgm.svg", scale: "scale-70" },
   { name: "HTML", level: 85, icon: "/images/Skills/html.svg", scale: "scale-100" },
   { name: "CSS", level: 80, icon: "/images/Skills/css.svg", scale: "scale-100" },
   { name: "JavaScript", level: 60, icon: "/images/Skills/js.svg", scale: "scale-95" },
   { name: "React", level: 55, icon: "/images/Skills/rct.svg", scale: "scale-110" },
   { name: "Next.js", level: 55, icon: "/images/Skills/nextdotjs.svg", scale: "scale-95" },
-  { name: "Tailwind", level: 70, icon: "/images/tools/tailwindcss.svg", scale: "scale-110", invert: true },
-  { name: "WordPress", level: 85, icon: "/images/skills/wordpress.svg", scale: "scale-95" },
-  { name: "VS Code", level: 90, icon: "/images/skills/vscode.svg", scale: "scale-95" },
+  { name: "Tailwind", level: 70, icon: "/images/Skills/tailwindcss.svg", scale: "scale-110", invert: true },
+  { name: "WordPress", level: 85, icon: "/images/Skills/wordpress.svg", scale: "scale-95" },
+  { name: "VS Code", level: 90, icon: "/images/Skills/vscode.svg", scale: "scale-95" },
   { name: "Git / GitHub", level: 70, icon: "", scale: "scale-95", github: true },
 ];
 
