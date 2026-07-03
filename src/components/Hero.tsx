@@ -146,7 +146,7 @@ export default function Hero() {
                 <div className="w-px h-12 bg-white/10 mx-4 shrink-0" />
                 {/* Kanan: projects */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-2xl font-semibold text-white leading-none"><Counter target={10} suffix="+" /></p>
+                  <p className="text-2xl font-semibold text-white leading-none"><Counter target={30} suffix="+" /></p>
                   <p className="text-sm text-gray-400 mt-1">Projects Completed</p>
                 </div>
               </div>

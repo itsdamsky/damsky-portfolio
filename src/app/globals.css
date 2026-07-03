@@ -103,20 +103,29 @@ body {
   overflow-x: hidden;
 }
 
-/* Optimize animations on mobile */
-@media (max-width: 768px) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+/* Page transition — pure CSS, no JS per-frame cost.
+   Runs automatically whenever an element with this class mounts (i.e. every
+   route change, since PageWrapper keys a fresh div by pathname). Short and
+   GPU-only (opacity + transform), so it can't compete with the browser's
+   own work the way a JS-driven animation library can. */
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-  @media (prefers-reduced-motion: no-preference) {
-    * {
-      animation-duration: inherit !important;
-      animation-iteration-count: inherit !important;
-      transition-duration: inherit !important;
-    }
+.page-transition {
+  animation: pageFadeIn 180ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-transition {
+    animation: none;
   }
 }
 
