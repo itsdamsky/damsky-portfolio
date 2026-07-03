@@ -177,8 +177,18 @@ export default function Navbar() {
           items={spotlightNavItems}
           activeId={spotlightNavItems[activeIndex]?.id}
           onChange={(id) => {
-            const item = menuItems.find((m) => m.label === id);
+            const index = menuItems.findIndex((m) => m.label === id);
+            const item = menuItems[index];
             if (!item) return;
+
+            // Move the spotlight the instant a finger taps — don't wait
+            // for the route to actually finish changing. The pathname
+            // effect above will re-sync this if needed (e.g. browser
+            // back/forward), but for a normal tap this is what makes it
+            // feel like it registered on the first touch instead of
+            // needing several taps before anything visibly happens.
+            setActiveIndex(index);
+
             if (item.href.startsWith("mailto")) {
               window.location.href = item.href;
             } else {

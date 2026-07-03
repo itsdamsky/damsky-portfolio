@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useLayoutEffect, useCallback } from "react";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 
 export interface SpotlightNavItem {
@@ -62,6 +62,15 @@ export default function SpotlightBottomNav({
   const BOTTOM_LEFT = (BEAM_BOX_W - BEAM_BOTTOM_W) / 2;
   const BOTTOM_RIGHT = BOTTOM_LEFT + BEAM_BOTTOM_W;
 
+  // Pre-offset the x transforms so each element is already centered on
+  // `center`, instead of mixing a motion-value `x` with a static
+  // `translateX: -50%`. Mixing those two forces the browser to recompute
+  // the transform on the main thread every frame instead of just moving a
+  // GPU layer — that's the #1 cause of the animation feeling laggy on
+  // phones. A single `x` channel stays fully compositor-driven.
+  const barX = useTransform(center, (v) => v - BAR_W / 2);
+  const beamX = useTransform(center, (v) => v - BEAM_BOX_W / 2);
+
   const measure = useCallback(() => {
     const container = containerRef.current;
     const el = itemRefs.current[activeId];
@@ -109,18 +118,21 @@ export default function SpotlightBottomNav({
           top: -3,
           height: 6,
           width: BAR_W,
-          x: center,
-          translateX: "-50%",
+          x: barX,
+          willChange: "transform",
           background: gradient,
           opacity: ready ? 1 : 0,
-          boxShadow: `0 0 12px 2px ${beamColor}99`,
+          boxShadow: `0 0 8px 1px ${beamColor}88`,
         }}
       />
 
       {/* ---- light beam / cone ---- */}
       {/* box is sized to the wider of the two ends, so the cone can
           either flare out OR converge (like a real spotlight narrowing
-          onto the icon) without getting clipped by its own box */}
+          onto the icon) without getting clipped by its own box.
+          clip-path is a static shape here (only `x` animates), so it can
+          stay on the compositor as long as it gets its own layer — hence
+          willChange below. */}
       <motion.div
         aria-hidden
         className="pointer-events-none absolute"
@@ -128,8 +140,8 @@ export default function SpotlightBottomNav({
           top: 0,
           height: 58,
           width: BEAM_BOX_W,
-          x: center,
-          translateX: "-50%",
+          x: beamX,
+          willChange: "transform",
           opacity: ready ? 1 : 0,
           clipPath: `polygon(${TOP_LEFT}px 0, ${TOP_RIGHT}px 0, ${BOTTOM_RIGHT}px 100%, ${BOTTOM_LEFT}px 100%)`,
           background: `linear-gradient(180deg, ${accentFrom}66 0%, ${accentTo}22 60%, transparent 100%)`,
@@ -149,6 +161,7 @@ export default function SpotlightBottomNav({
             type="button"
             onClick={() => onChange(item.id)}
             className="relative z-10 flex-1 flex items-center justify-center outline-none"
+            style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}
             aria-label={item.label}
             aria-current={isActive ? "page" : undefined}
           >
