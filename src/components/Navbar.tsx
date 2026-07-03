@@ -27,6 +27,13 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScroll]);
 
+  // The bottom nav navigates with router.push() from a plain <button>,
+  // not <Link>. Next.js only auto-prefetches routes rendered through
+  // <Link>, so without this, every single tap on Skills/Contact/etc was
+  // a cold navigation — the browser only started downloading that route's
+  // JS the moment you tapped, which is what read as "lag". Prefetching
+  // every route once, right when the nav mounts, means the JS is already
+  // sitting in the cache by the time someone taps it.
   const menuItems = [
     { href: "/", label: "Home", icon: Home },
     { href: "/about", label: "About", icon: User },
@@ -34,6 +41,15 @@ export default function Navbar() {
     { href: "/skills", label: "Skills", icon: Cpu },
     { href: "/contact", label: "Contact", icon: Phone },
   ];
+
+  useEffect(() => {
+    menuItems.forEach((item) => {
+      if (!item.href.startsWith("mailto")) {
+        router.prefetch(item.href);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // SpotlightBottomNav butuh bentuk { id, label, icon } — id dipakai sebagai
   // key aktif/onChange, jadi kita reuse `label` sebagai id (sudah unik).
