@@ -1,41 +1,41 @@
 "use client";
 
 /**
- * LiquidBottomNav — "pin-down" variant
+ * LiquidBottomNav — "floating marble" variant
  * ------------------------------------------------------------------
- * Matches the reference video: instead of a blob rising ABOVE the bar
- * (a hill), the bar's own top edge dips DOWN into a socket/valley, and
- * a solid marble (with the active icon inside it, in white) nests into
- * that socket — mostly sitting inside the bar, with just the top of
- * the ball poking above the flat edge. Small raised "lips" on either
- * side of the socket sell the liquid/metaball feel (surface tension
- * pulling up right before it dips to cradle the marble).
+ * Per the latest reference: the bar stays perfectly FLAT (no notch,
+ * no fusion, no dip cut into it) and the active marble floats freely
+ * above it with a clear gap of visible background between the marble's
+ * bottom edge and the bar's top edge — like a FAB hovering over a tab
+ * bar, not welded into it. The marble itself is a clean, flat-filled
+ * circle: no blurred glow/halo behind it.
  *
  * Layout requirements from the brief:
  *  - full width, edge-to-edge (no side margins)
- *  - flush against the bottom of the screen (no floating gap)
+ *  - flush against the bottom of the screen (no floating gap under the bar)
  *  - square corners — no border-radius anywhere on the bar
+ *  - a clear GAP between the marble and the bar (they never touch)
+ *  - marble has no glow/blur background — just a clean solid shape
  *
- * Physics (unchanged in spirit from the original):
+ * Physics (kept from the rubber-jiggle pass, just detached from the
+ * bar shape since the bar no longer deforms):
  *  - indicatorX : spring-driven horizontal position of the marble
  *  - velocity   : real-time rate of change of indicatorX
- *  - stretch    : |velocity| -> extra socket width (liquid drag)
- *  - lean       : velocity  -> asymmetric control-point skew (tail)
+ *  - stretch    : |velocity| -> horizontal elongation (liquid drag)
+ *  - lean       : velocity  -> asymmetric skew of the stretch
  *  - lift       : underdamped spring impulse (0 -> 1 -> 0) fired on
- *                 every tab change for a natural overshoot + settle
+ *                 every tab change — marble hops up a little further
+ *                 above the bar, then settles back to its resting gap
+ *  - wobble     : a plucked, very underdamped spring kicked on every
+ *                 tab change — read every frame as squash/stretch on
+ *                 the marble for a "rubber ball" jiggle as it lands
  *
  * All per-frame writes touch the DOM directly (refs) inside
  * useAnimationFrame — React only re-renders on actual tab changes.
  * ------------------------------------------------------------------
  */
 
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   animate,
   AnimatePresence,
@@ -74,7 +74,7 @@ export interface LiquidBottomNavProps {
   defaultActiveId?: string;
   onChange?: (id: string) => void;
   className?: string;
-  /** Marble / blob gradient */
+  /** Marble gradient */
   accentFrom?: string;
   accentTo?: string;
   /** Bar surface color */
@@ -90,21 +90,20 @@ export interface LiquidBottomNavProps {
 /*  Geometry constants                                                 */
 /* ------------------------------------------------------------------ */
 
-const BAR_HEIGHT = 76; // flat bar height (excludes safe-area strip below)
+const BAR_HEIGHT = 64; // flat bar height, tight to the icon row — flush to the line, nothing above/below it
 const MARBLE_R = 30; // resting marble radius
-const POKE_ABOVE = 15; // how much of the marble pokes above the flat top edge
-const NOTCH_HALF_WIDTH = MARBLE_R + 8; // resting socket half-width
-const MAX_STRETCH = 16; // extra socket half-width while moving fast
-const MAX_LEAN = 16; // max asymmetric control-point skew
+const GAP = 14; // clear space between the marble's bottom edge and the wave's lowest point — they never touch
+const MAX_STRETCH = 16; // extra horizontal radius while moving fast (same magnitude as the pin-down version)
+const MAX_LEAN = 16; // max horizontal skew of the stretch (same magnitude as the pin-down version)
 const STRETCH_FACTOR = 0.045; // px/s -> stretch px
 const LEAN_FACTOR = 0.026; // px/s -> lean px
-const SHOULDER_SPAN = 22; // horizontal reach of the raised "lip" beside the socket
-const SHOULDER_RISE = 5; // resting lip rise above the flat edge
-const LIFT_EXTRA = 6; // additional lip rise + depth added by the bounce impulse
-const NOTCH_DEPTH = MARBLE_R + 12; // resting socket depth (how far it cuts into the bar)
-const TOP_PAD = POKE_ABOVE + SHOULDER_RISE + LIFT_EXTRA + 6; // room above the bar for the marble to poke into
+const LIFT_EXTRA = 6; // extra hop height added by the bounce impulse
+const WAVE_HALF_WIDTH = MARBLE_R + 12; // resting half-width of the dip under the marble
+const WAVE_SPAN = 26; // extra horizontal reach for the dip's smooth transition back to flat
+const WAVE_DEPTH = 14; // how far the bar's surface dips down (always DOWN, never above the flat line)
+const TOP_PAD = GAP + MARBLE_R * 2 + LIFT_EXTRA + 6; // room above the bar for the marble to float in
 
-const MARBLE_CY = TOP_PAD + MARBLE_R - POKE_ABOVE; // marble center, relative to svg y=0
+const MARBLE_CY = TOP_PAD - GAP - MARBLE_R; // marble resting center, relative to svg y=0
 
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
 
@@ -202,12 +201,11 @@ export default function LiquidBottomNav({
   const lean = useTransform(velocity, (v) => clamp(v * LEAN_FACTOR, -MAX_LEAN, MAX_LEAN));
 
   /* ---------------- rubber jiggle: a plucked, underdamped spring ---------------- */
-  /* This is what actually sells "melting rubber ball" — on every tab
-     change we kick this value with a hard velocity impulse and let a
-     very underdamped spring settle it back to 0. Because damping is so
-     low, it overshoots past zero repeatedly (like a rubber band being
-     let go), and we read that oscillation every frame to squash/stretch
-     the marble and ripple the socket membrane in sync. */
+  /* On every tab change we kick this value with a hard velocity impulse
+     and let a very underdamped spring settle it back to 0. Because
+     damping is so low, it overshoots past zero repeatedly (like a
+     rubber band being let go), and we read that oscillation every
+     frame to squash/stretch the marble as it "lands". */
   const wobble = useMotionValue(0);
   useEffect(() => {
     wobble.jump(0);
@@ -222,74 +220,81 @@ export default function LiquidBottomNav({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeIndex]);
 
-  /* ---------------- dynamic bar path + marble — recomputed every frame ---------------- */
+  /* ---------------- marble + bar wave — recomputed every frame ---------------- */
+  /* PERF NOTE: the marble's own motion is still 100% CSS transform
+     (compositor-only, see below). The bar's wave genuinely needs to
+     redraw its `d` attribute because its shape changes — but we guard
+     it with a change-threshold so it's a no-op (skips setAttribute
+     entirely) whenever the marble is at rest, which is most of the
+     time. It only does real work during the ~300-500ms of an actual
+     tab transition. */
   const barRef = useRef<SVGPathElement>(null);
-  const marbleRef = useRef<SVGEllipseElement>(null);
-  const gradientRef = useRef<SVGRadialGradientElement>(null);
+  const marbleRef = useRef<SVGCircleElement>(null);
   const marbleIconRef = useRef<HTMLDivElement>(null);
+  const lastCxRef = useRef<number | null>(null);
+  const lastShapeKeyRef = useRef<number>(0);
 
   useAnimationFrame(() => {
-    if (!barRef.current || barWidth === 0) return;
+    if (barWidth === 0) return;
 
-    const cx = indicatorX.get();
+    const cx = indicatorX.get() + lean.get();
     const liftV = lift.get();
     const s = stretch.get();
-    const l = lean.get();
     const w = wobble.get(); // decaying oscillation, plucked on tab change
 
-    const top = TOP_PAD;
-    const bottom = TOP_PAD + BAR_HEIGHT;
-    const halfW = NOTCH_HALF_WIDTH + s;
-    const shoulderRise = SHOULDER_RISE + liftV * LIFT_EXTRA - w * 0.012;
-    const notchDepth = NOTCH_DEPTH + liftV * LIFT_EXTRA * 0.6 + w * 0.02;
-    const valleyY = top + notchDepth;
+    // Marble hops a bit further from the wave on impulse, then settles
+    // back to its resting gap — it never touches the bar.
+    const marbleCy = MARBLE_CY - liftV * LIFT_EXTRA;
 
-    const leftOuter = clamp(cx - halfW - SHOULDER_SPAN, 0, barWidth);
-    const leftInner = clamp(cx - halfW, 0, barWidth);
-    const rightInner = clamp(cx + halfW, 0, barWidth);
-    const rightOuter = clamp(cx + halfW + SHOULDER_SPAN, 0, barWidth);
-
-    // Control points skewed by `lean` toward the direction of travel —
-    // gives the socket a subtle asymmetric drag as the marble slides.
-    const lc1x = leftOuter + (leftInner - leftOuter) * 0.35 - l * 0.4;
-    const lc2x = cx - halfW * 0.55 - l * 0.5;
-    const rc1x = cx + halfW * 0.55 - l * 0.5;
-    const rc2x = rightInner + (rightOuter - rightInner) * 0.65 - l * 0.4;
-
-    const d = [
-      `M 0 ${top}`,
-      `L ${leftOuter} ${top}`,
-      // raised lip, then dive down into the socket to the valley floor
-      `C ${lc1x} ${top - shoulderRise}, ${lc2x} ${valleyY}, ${cx} ${valleyY}`,
-      // climb back out of the socket, raised lip on the way up, back to flat
-      `C ${rc1x} ${valleyY}, ${rc2x} ${top - shoulderRise}, ${rightOuter} ${top}`,
-      `L ${barWidth} ${top}`,
-      `L ${barWidth} ${bottom}`,
-      `L 0 ${bottom}`,
-      "Z",
-    ].join(" ");
-
-    barRef.current.setAttribute("d", d);
-
-    const marbleCy = MARBLE_CY - liftV * (LIFT_EXTRA * 0.5);
     // Squash & stretch: positive wobble widens+flattens (impact squash),
-    // negative wobble narrows+elongates (rebound stretch) — classic
-    // rubber-ball deformation, volume roughly preserved either way.
-    const squashStretch = clamp(w * 0.0009, -0.32, 0.32);
-    const rx = clamp(MARBLE_R + s * 0.3 + MARBLE_R * squashStretch, MARBLE_R * 0.6, MARBLE_R * 1.5);
-    const ry = clamp(MARBLE_R - MARBLE_R * squashStretch * 0.85, MARBLE_R * 0.6, MARBLE_R * 1.5);
+    // negative wobble narrows+elongates (rebound stretch).
+    const squashStretch = clamp(w * 0.0009, -0.3, 0.3);
+    const scaleX = clamp((MARBLE_R + s + MARBLE_R * squashStretch) / MARBLE_R, 0.65, 1.5);
+    const scaleY = clamp(1 - squashStretch * 0.85, 0.65, 1.5);
+
     if (marbleRef.current) {
-      marbleRef.current.setAttribute("cx", String(cx));
-      marbleRef.current.setAttribute("cy", String(marbleCy));
-      marbleRef.current.setAttribute("rx", String(rx));
-      marbleRef.current.setAttribute("ry", String(ry));
-    }
-    if (gradientRef.current) {
-      gradientRef.current.setAttribute("cx", String(cx - MARBLE_R * 0.3));
-      gradientRef.current.setAttribute("cy", String(marbleCy - MARBLE_R * 0.35));
+      marbleRef.current.style.transform = `translate(${cx}px, ${marbleCy}px) scale(${scaleX}, ${scaleY})`;
     }
     if (marbleIconRef.current) {
       marbleIconRef.current.style.transform = `translate(${cx}px, ${marbleCy}px) translate(-50%, -50%)`;
+    }
+
+    // Skip the bar redraw entirely if nothing meaningfully changed
+    // since last frame (marble at rest) — this is what keeps the wave
+    // from costing anything during the ~99% of the time nothing moves.
+    const shapeKey = Math.round(cx * 4) + Math.round(s * 4) * 100000 + Math.round(liftV * 100) * 100000000;
+    if (barRef.current && (lastCxRef.current === null || shapeKey !== lastShapeKeyRef.current)) {
+      lastCxRef.current = cx;
+      lastShapeKeyRef.current = shapeKey;
+
+      const top = TOP_PAD;
+      const bottom = TOP_PAD + BAR_HEIGHT;
+      const halfW = WAVE_HALF_WIDTH + s;
+      const depth = WAVE_DEPTH + liftV * 4;
+      const valleyY = top + depth;
+
+      const leftOuter = clamp(cx - halfW - WAVE_SPAN, 0, barWidth);
+      const rightOuter = clamp(cx + halfW + WAVE_SPAN, 0, barWidth);
+
+      // Control points only ever pull the curve DOWN from the flat
+      // line — the wave dips, it never rises above it.
+      const lc1x = leftOuter + (cx - leftOuter) * 0.55;
+      const lc2x = cx - halfW * 0.3;
+      const rc1x = cx + halfW * 0.3;
+      const rc2x = rightOuter - (rightOuter - cx) * 0.55;
+
+      const d = [
+        `M 0 ${top}`,
+        `L ${leftOuter} ${top}`,
+        `C ${lc1x} ${top}, ${lc2x} ${valleyY}, ${cx} ${valleyY}`,
+        `C ${rc1x} ${valleyY}, ${rc2x} ${top}, ${rightOuter} ${top}`,
+        `L ${barWidth} ${top}`,
+        `L ${barWidth} ${bottom}`,
+        `L 0 ${bottom}`,
+        "Z",
+      ].join(" ");
+
+      barRef.current.setAttribute("d", d);
     }
   });
 
@@ -328,27 +333,21 @@ export default function LiquidBottomNav({
       >
         <defs>
           <radialGradient
-            ref={gradientRef}
             id="liquidMarbleGradient"
-            gradientUnits="userSpaceOnUse"
-            r={MARBLE_R * 1.6}
+            gradientUnits="objectBoundingBox"
+            cx="35%"
+            cy="30%"
+            r="75%"
           >
             <stop offset="0%" stopColor={accentFrom} />
             <stop offset="100%" stopColor={accentTo} />
           </radialGradient>
-          <filter id="marbleShadow" x="-80%" y="-80%" width="260%" height="260%">
-            <feDropShadow dx="0" dy="3" stdDeviation="4" floodColor="#000000" floodOpacity="0.35" />
-          </filter>
         </defs>
 
-        {/* the bar surface itself, square corners, full width — with the
-            socket cut straight into its top edge */}
-        <path
-          ref={barRef}
-          fill={surfaceColor}
-          stroke="rgba(255,255,255,0.08)"
-          strokeWidth={1}
-        />
+        {/* the bar surface — square corners, full width. Its top edge
+            dips into a smooth wave under the marble (never rises above
+            the flat line), but never actually touches the marble. */}
+        <path ref={barRef} fill={surfaceColor} />
 
         {/* arrival ripples, drawn under the marble so the marble reads on top */}
         <AnimatePresence>
@@ -362,22 +361,29 @@ export default function LiquidBottomNav({
               stroke={accentTo}
               strokeWidth={2}
               initial={{ opacity: 0.4, r: 10 }}
-              animate={{ opacity: 0, r: 46 }}
+              animate={{ opacity: 0, r: 40 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
             />
           ))}
         </AnimatePresence>
 
-        {/* the marble, nested into the socket */}
-        <ellipse
+        {/* the marble — clean flat fill, no blur/glow halo behind it.
+            Sits at a fixed local origin; all motion comes from
+            style.transform (see the useAnimationFrame loop above), so
+            the browser can composite it on the GPU instead of
+            re-laying-out SVG geometry every frame. */}
+        <circle
           ref={marbleRef}
           cx={0}
-          cy={MARBLE_CY}
-          rx={MARBLE_R}
-          ry={MARBLE_R}
+          cy={0}
+          r={MARBLE_R}
           fill="url(#liquidMarbleGradient)"
-          filter="url(#marbleShadow)"
+          style={{
+            transformBox: "fill-box",
+            transformOrigin: "center",
+            willChange: "transform",
+          }}
         />
       </svg>
 
@@ -402,7 +408,7 @@ export default function LiquidBottomNav({
               className="relative flex items-center justify-center flex-1 h-full bg-transparent"
             >
               {/* active item's own icon is hidden — it's represented by
-                  the marble instead */}
+                  the floating marble instead */}
               <div style={{ color: iconColorInactive, opacity: isActive ? 0 : 1 }}>
                 <Icon size={22} strokeWidth={2} color="currentColor" />
               </div>
