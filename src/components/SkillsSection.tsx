@@ -112,11 +112,17 @@ export default function SkillsSection() {
               {categories[activeCategory].skills.map((skill, i) => (
                 <motion.div
                   key={skill.name}
-                  initial={{ opacity: 0, y: 32, filter: "blur(6px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  // NOTE: was animating `filter: blur()` here. Animating CSS
+                  // filter forces the browser to repaint every frame instead
+                  // of just moving a GPU layer — that's what made this page
+                  // feel laggy on phones. opacity + y (transform) achieves a
+                  // near-identical "fade & rise in" look while staying fully
+                  // compositor-driven.
+                  initial={{ opacity: 0, y: 32 }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{
-                    duration: 0.55,
-                    delay: i * 0.12,
+                    duration: 0.4,
+                    delay: i * 0.08,
                     ease: [0.25, 0.1, 0.25, 1],
                   }}
                 >

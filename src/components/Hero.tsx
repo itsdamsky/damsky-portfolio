@@ -85,9 +85,14 @@ export default function Hero() {
       <div className="md:hidden flex flex-col py-6 pb-10">
 
         {/* GLOW mobile - reduced blur for better performance */}
+        {/* Was rendering 10 animated dots the instant this page mounts —
+            right on top of the page-transition animation and the two
+            Counter instances below. Cutting to 6 keeps the sparkle effect
+            while meaningfully lowering paint work during that first
+            second on screen. */}
         <div className="absolute inset-0 pointer-events-none">
           {dots.map((dot, i) => (
-            i < 10 && (
+            i < 6 && (
               <span
                 key={i}
                 className="absolute w-[3px] h-[3px] bg-orange-400 rounded-full opacity-50"
@@ -107,9 +112,12 @@ export default function Hero() {
 
           {/* Photo + overlapping stats card */}
           <div className="relative flex flex-col items-center mb-6">
-            {/* Glow - optimized for mobile */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[300px] bg-orange-600/30 blur-[60px] rounded-full z-0" />
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200px] h-[200px] bg-orange-500/50 blur-[40px] rounded-full z-0" />
+            {/* Glow - optimized for mobile.
+                Was 2 stacked blurred circles (60px + 40px) — each `blur()`
+                is its own expensive paint pass on mobile GPUs. One circle
+                with a slightly stronger color gets the same glow look for
+                roughly half the blur cost. */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[260px] h-[260px] bg-orange-500/45 blur-[50px] rounded-full z-0" />
             {/* Circle ring */}
             <div className="absolute top-6 left-1/2 -translate-x-1/2 w-[290px] h-[290px] rounded-full border-2 border-orange-500/80 shadow-[0_0_30px_rgba(255,140,0,0.6)] z-10" />
             {/* Photo */}

@@ -19,26 +19,31 @@ export default function Counter({
   }, []);
 
   useEffect(() => {
-
-    let start = 0;
+    // Was setInterval(..., 16) — a JS timer firing ~60x/sec independently of
+    // the browser's actual paint cycle. That's an extra, uncoordinated timer
+    // competing with the page-transition animation right when this
+    // component mounts (Home page load). requestAnimationFrame ties the
+    // update to the browser's own render cycle instead, so it never fires
+    // more than needed and never fights the transition for the main thread.
+    let rafId: number;
+    let startTime: number | null = null;
     const duration = animationDuration;
-    const increment = target / (duration / 16);
 
-    const timer = setInterval(() => {
+    const tick = (timestamp: number) => {
+      if (startTime === null) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / duration, 1);
 
-      start += increment;
+      setCount(Math.floor(progress * target));
 
-      if (start >= target) {
-        setCount(target);
-        clearInterval(timer);
-      } else {
-        setCount(Math.floor(start));
+      if (progress < 1) {
+        rafId = requestAnimationFrame(tick);
       }
+    };
 
-    }, 16);
+    rafId = requestAnimationFrame(tick);
 
-    return () => clearInterval(timer);
-
+    return () => cancelAnimationFrame(rafId);
   }, [target, animationDuration]);
 
   return (

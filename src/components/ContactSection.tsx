@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import emailjs from "@emailjs/browser";
 import { Mail, Phone, MapPin } from "lucide-react";
 
 export default function ContactSection() {
@@ -13,6 +12,13 @@ export default function ContactSection() {
     if (!formRef.current) return;
     setStatus("loading");
     try {
+      // emailjs was previously imported at the top of the file, which
+      // means Next.js bundles it into this route's JS and the browser has
+      // to download + parse it before the Contact page can even finish
+      // rendering — that's the "lag" felt right when navigating here.
+      // Importing it on demand (only when the form is submitted) keeps it
+      // out of the page's initial load entirely.
+      const emailjs = (await import("@emailjs/browser")).default;
       await emailjs.sendForm(
         "service_vj9ul05",
         "ry8ljde",
