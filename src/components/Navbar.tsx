@@ -6,7 +6,7 @@ import { Home, User, FolderOpen, Cpu, Phone } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import LiquidBottomNav, { LiquidNavItem } from "./LiquidBottomNav";
+import SpotlightBottomNav, { SpotlightNavItem } from "./SpotlightBottomNav";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -35,9 +35,9 @@ export default function Navbar() {
     { href: "/contact", label: "Contact", icon: Phone },
   ];
 
-  // LiquidBottomNav butuh bentuk { id, label, icon } — id dipakai sebagai
+  // SpotlightBottomNav butuh bentuk { id, label, icon } — id dipakai sebagai
   // key aktif/onChange, jadi kita reuse `label` sebagai id (sudah unik).
-  const liquidNavItems: LiquidNavItem[] = menuItems.map((item) => ({
+  const spotlightNavItems: SpotlightNavItem[] = menuItems.map((item) => ({
     id: item.label,
     label: item.label,
     icon: item.icon,
@@ -160,26 +160,22 @@ export default function Navbar() {
         </a>
       </motion.header>
 
-      {/* ===== MOBILE BOTTOM NAVBAR — LIQUID "PIN-DOWN" NAV ===== */}
+      {/* ===== MOBILE BOTTOM NAVBAR — SPOTLIGHT NAV ===== */}
       {/*
         - full width, edge-to-edge: no px padding, no left/right inset.
         - flush to the very bottom: the bar's own background extends
           through the safe-area inset via paddingBottom, instead of
           floating above it with a gap.
-        - no rounded corners anywhere (component itself draws square
-          corners; this wrapper adds none either).
       */}
       <div
-        className="md:hidden fixed bottom-0 left-0 right-0 z-50"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50 px-4 pb-4"
         style={{
-          backgroundColor: "#1e1e22",
-          paddingBottom: "env(safe-area-inset-bottom)",
-          boxShadow: "0 -10px 30px rgba(0,0,0,0.5)",
+          paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)",
         }}
       >
-        <LiquidBottomNav
-          items={liquidNavItems}
-          activeId={liquidNavItems[activeIndex]?.id}
+        <SpotlightBottomNav
+          items={spotlightNavItems}
+          activeId={spotlightNavItems[activeIndex]?.id}
           onChange={(id) => {
             const item = menuItems.find((m) => m.label === id);
             if (!item) return;
@@ -189,12 +185,13 @@ export default function Navbar() {
               router.push(item.href);
             }
           }}
-          surfaceColor="#1e1e22"
-          iconColorInactive="rgba(255,255,255,0.45)"
-          iconColorActive="#ffffff"
+          surfaceColor="rgba(30,30,34,0.9)"
+          iconColorInactive="rgba(255,255,255,0.4)"
+          iconColorActive="#ff9142"
+          beamColor="#ff9142"
           accentFrom="#ff9142"
           accentTo="#e84c00"
-          springConfig={{ stiffness: 210, damping: 20, mass: 1 }}
+          springConfig={{ stiffness: 260, damping: 24, mass: 1 }}
         />
       </div>
     </>
