@@ -10,22 +10,48 @@ import SpotlightBottomNav, { SpotlightNavItem } from "./SpotlightBottomNav";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
-  const [headerVisible, setHeaderVisible] = useState(true);
-  const [lastScroll, setLastScroll] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
   const pathname = usePathname();
   const router = useRouter();
 
   useEffect(() => {
-    const handleScroll = () => {
+    // Hysteresis: hide only past HIDE_AT, show again only once back below
+    // SHOW_AT, and do nothing while inside the dead zone between them.
+    // Without this gap, scrolling to sit right around a single threshold
+    // (e.g. 20px) flips `scrolled` back and forth on every tiny wobble,
+    // which restarts the 0.4s fade mid-animation every time — that's what
+    // reads as "not smooth" rather than an actual dropped frame.
+    const HIDE_AT = 24;
+    const SHOW_AT = 8;
+
+    let ticking = false;
+
+    const update = () => {
       const current = window.scrollY;
-      setScrolled(current > 20);
-      setHeaderVisible(current < lastScroll || current < 10);
-      setLastScroll(current);
+      setScrolled((prev) => {
+        if (current > HIDE_AT) return true;
+        if (current < SHOW_AT) return false;
+        return prev;
+      });
+      ticking = false;
     };
+
+    // Scroll fires far more often than the browser can paint, especially
+    // on mobile momentum-scrolling. Running setState on every single event
+    // queues a React re-render per event too — piling up work on the same
+    // thread that's supposed to be driving the fade animation. Coalescing
+    // to one state check per animation frame is what keeps the fade itself
+    // uncontested.
+    const handleScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        window.requestAnimationFrame(update);
+      }
+    };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScroll]);
+  }, []);
 
   // The bottom nav navigates with router.push() from a plain <button>,
   // not <Link>. Next.js only auto-prefetches routes rendered through
@@ -153,14 +179,12 @@ export default function Navbar() {
       {/* ===== MOBILE HEADER ATAS (tidak berubah sama sekali) ===== */}
       <motion.header
         className="md:hidden fixed top-0 left-0 right-0 z-502 flex items-center justify-between px-5 py-4"
+        style={{ willChange: "transform, opacity" }}
         animate={{
           opacity: scrolled ? 0 : 1,
           y: scrolled ? -20 : 0,
         }}
-        transition={{
-          duration: 0.4,
-          ease: [0.25, 0.46, 0.45, 0.94],
-        }}
+        transition={{ type: "spring", stiffness: 300, damping: 30, mass: 0.8 }}
       >
         <Link href="/" className="flex items-center gap-1.5">
           <img src="/images/navbar/Logo-A.svg" alt="logo" className="h-7 w-7 object-contain" />
@@ -178,15 +202,16 @@ export default function Navbar() {
 
       {/* ===== MOBILE BOTTOM NAVBAR — SPOTLIGHT NAV ===== */}
       {/*
-        - full width, edge-to-edge: no px padding, no left/right inset.
-        - flush to the very bottom: the bar's own background extends
-          through the safe-area inset via paddingBottom, instead of
-          floating above it with a gap.
+        - full width, edge-to-edge: no px padding, no left/right inset,
+          no rounded corners on the bar itself (handled inside the
+          component now).
+        - flush to the very bottom: only safe-area inset padding, no
+          extra gap floating the bar above the screen edge.
       */}
       <div
-        className="md:hidden fixed bottom-0 left-0 right-0 z-50 px-4 pb-4"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50"
         style={{
-          paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)",
+          paddingBottom: "env(safe-area-inset-bottom)",
         }}
       >
         <SpotlightBottomNav
@@ -211,7 +236,9 @@ export default function Navbar() {
               router.push(item.href);
             }
           }}
-          surfaceColor="rgba(30,30,34,0.9)"
+          surfaceColor="rgba(42,42,48,0.92)"
+          borderColor="rgba(255,255,255,0.08)"
+          cornerRadius={14}
           iconColorInactive="rgba(255,255,255,0.4)"
           iconColorActive="#ff9142"
           beamColor="#ff9142"

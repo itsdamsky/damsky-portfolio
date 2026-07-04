@@ -1,7 +1,13 @@
 "use client";
 
 import { useRef, useState, useLayoutEffect } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+  useMotionValueEvent,
+} from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 
 export interface SpotlightNavItem {
@@ -23,79 +29,95 @@ interface SpotlightBottomNavProps {
   surfaceColor?: string;
   iconColorInactive?: string;
   iconColorActive?: string;
-  /** solid fallback color for the glow (used for box-shadow) */
   beamColor?: string;
-  /** gradient endpoints for the rim bar + beam — defaults to the site's orange theme */
   accentFrom?: string;
   accentTo?: string;
   springConfig?: SpringConfig;
+}
+
+// Kotak (siku) dengan lembah/dip di tengah atas — sama seperti sebelumnya,
+// tapi semua sudut arc (rounded) diganti garis lurus supaya bar-nya kotak
+// tegas, bukan pill.
+function buildPillPath(w: number, h: number, cx: number, dipWidth: number, dipDepth: number) {
+  const left = Math.max(cx - dipWidth / 2, 4);
+  const right = Math.min(cx + dipWidth / 2, w - 4);
+  const c = dipWidth * 0.28;
+
+  return [
+    `M 0 0`,
+    `L ${left} 0`,
+    `C ${left + c} 0, ${cx - c} ${dipDepth}, ${cx} ${dipDepth}`,
+    `C ${cx + c} ${dipDepth}, ${right - c} 0, ${right} 0`,
+    `L ${w} 0`,
+    `L ${w} ${h}`,
+    `L 0 ${h}`,
+    "Z",
+  ].join(" ");
 }
 
 export default function SpotlightBottomNav({
   items,
   activeId,
   onChange,
-  surfaceColor = "rgba(70,70,74,0.9)",
-  iconColorInactive = "rgba(20,20,22,0.85)",
-  iconColorActive = "#ff9142",
+  // Diganti dari hitam ke abu-abu gelap netral, supaya kelihatan sebagai
+  // elemen terpisah di atas background page yang full hitam.
+  surfaceColor = "#1c1c22",
+  iconColorInactive = "rgba(255,255,255,0.45)",
+  iconColorActive = "#fff",
   beamColor = "#ff9142",
   accentFrom = "#ff9142",
   accentTo = "#e84c00",
   springConfig = { stiffness: 260, damping: 24, mass: 1 },
 }: SpotlightBottomNavProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const pathRef = useRef<SVGPathElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
   const [ready, setReady] = useState(false);
 
-  // center-x of the active icon, relative to container (clamped so the
-  // bar/beam never spill past the pill's rounded edges on the first/last item)
+  const PILL_H = 76;
+  const BAR_H = 116; // headroom above the pill for the circle to float in
+  const CIRCLE_D = 60;
+  const GAP = 0; // visible gap between the circle's underside and the valley
+  const DIP_DEPTH = 34; // how far the valley pushes down into the pill
+  const DIP_WIDTH = 130; // wide enough that the gap tapers gently, not abruptly
+
   const targetCenter = useMotionValue(0);
   const center = useSpring(targetCenter, springConfig);
+  const circleX = useTransform(center, (v) => v - CIRCLE_D / 2);
+  // Posisi X label nama menu ikut center yang sama dengan lingkaran aktif,
+  // supaya teksnya selalu ada di bawah item yang sedang aktif.
+  const labelX = useTransform(center, (v) => v);
 
-  const BAR_W = 64; // wide glowing bar
-  const BEAM_TOP_W = 60; // beam width right under the rim (close to bar width)
-  const BEAM_BOTTOM_W = 34; // beam narrows further as it reaches the icon
+  // Circle's vertical position is fixed (it doesn't bounce up/down, only
+  // side to side) — only the pill's valley position animates to track it.
+  const circleTop = DIP_DEPTH - GAP - CIRCLE_D / 2;
 
-  const BEAM_BOX_W = Math.max(BEAM_TOP_W, BEAM_BOTTOM_W);
-  const TOP_LEFT = (BEAM_BOX_W - BEAM_TOP_W) / 2;
-  const TOP_RIGHT = TOP_LEFT + BEAM_TOP_W;
-  const BOTTOM_LEFT = (BEAM_BOX_W - BEAM_BOTTOM_W) / 2;
-  const BOTTOM_RIGHT = BOTTOM_LEFT + BEAM_BOTTOM_W;
-
-  // Pre-offset the x transforms so each element is already centered on
-  // `center`, instead of mixing a motion-value `x` with a static
-  // `translateX: -50%`. Mixing those two forces the browser to recompute
-  // the transform on the main thread every frame instead of just moving a
-  // GPU layer — that's the #1 cause of the animation feeling laggy on
-  // phones. A single `x` channel stays fully compositor-driven.
-  const barX = useTransform(center, (v) => v - BAR_W / 2);
-  const beamX = useTransform(center, (v) => v - BEAM_BOX_W / 2);
-
-  // Measure the container's width once (and on resize) via ResizeObserver,
-  // instead of calling getBoundingClientRect() on every single tab switch.
-  // getBoundingClientRect() forces a synchronous layout reflow — and the
-  // old code ran it exactly when a tab changed, which is the same instant
-  // React is mounting/laying out the new page. Two forced-layout passes
-  // stacked on the same tick is what read as jank right on tap, separate
-  // from whatever the destination page itself was doing.
   useLayoutEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     setContainerWidth(container.getBoundingClientRect().width);
-
     const ro = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setContainerWidth(entry.contentRect.width);
-      }
+      for (const entry of entries) setContainerWidth(entry.contentRect.width);
     });
     ro.observe(container);
     return () => ro.disconnect();
   }, []);
 
-  // All nav items are equal-width flex-1 children of the same container,
-  // so the active item's center can be computed with plain arithmetic —
-  // no DOM measurement, no reflow — every time the active tab changes.
+  // Redraw the path directly on the DOM node on every spring tick instead
+  // of going through React state — a `d` attribute change can't be
+  // compositor-only like a transform, so keeping it out of React's render
+  // cycle is what keeps this from adding a second, redundant re-render on
+  // top of the unavoidable one.
+  useMotionValueEvent(center, "change", (latest) => {
+    if (pathRef.current && containerWidth) {
+      pathRef.current.setAttribute(
+        "d",
+        buildPillPath(containerWidth, PILL_H, latest, DIP_WIDTH, DIP_DEPTH)
+      );
+    }
+  });
+
   const activeIndex = items.findIndex((it) => it.id === activeId);
 
   useLayoutEffect(() => {
@@ -104,94 +126,125 @@ export default function SpotlightBottomNav({
     const itemWidth = containerWidth / items.length;
     let nextCenter = itemWidth * activeIndex + itemWidth / 2;
 
-    // keep the bar fully inside the pill, clear of its rounded corners
-    const margin = BAR_W / 2 + 12;
+    const margin = DIP_WIDTH / 2 + 4;
     nextCenter = Math.min(Math.max(nextCenter, margin), containerWidth - margin);
 
     targetCenter.set(nextCenter);
     if (!ready) {
       center.jump(nextCenter);
-      // One-time initialization: jump to the first position instantly
-      // (no spring animation) so the bar doesn't slide in from 0 on first
-      // paint, then flip `ready` so subsequent tab changes animate normally.
+      if (pathRef.current) {
+        pathRef.current.setAttribute(
+          "d",
+          buildPillPath(containerWidth, PILL_H, nextCenter, DIP_WIDTH, DIP_DEPTH)
+        );
+      }
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setReady(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeIndex, containerWidth, items.length]);
 
-  const gradient = `linear-gradient(90deg, ${accentFrom}, ${accentTo})`;
+  const gradient = `linear-gradient(135deg, ${accentFrom}, ${accentTo})`;
 
   return (
-    <div
-      ref={containerRef}
-      className="relative flex items-stretch w-full select-none overflow-hidden"
-      style={{ backgroundColor: surfaceColor, height: 76, borderRadius: 999 }}
-    >
-      {/* ---- glowing rim bar ---- */}
+    <div ref={containerRef} className="relative w-full select-none" style={{ height: BAR_H }}>
+      {/* ---- bar kotak (tidak melengkung) dengan dip/valley di top edge ---- */}
+      <svg
+        className="absolute left-0 right-0 bottom-0"
+        width="100%"
+        height={PILL_H}
+        style={{ overflow: "visible" }}
+      >
+        <path ref={pathRef} d={containerWidth ? buildPillPath(containerWidth, PILL_H, containerWidth / 2, DIP_WIDTH, DIP_DEPTH) : ""} fill={surfaceColor} />
+      </svg>
+
+      {/* ---- floating orange circle, separated from the valley by a gap ---- */}
       <motion.div
-        aria-hidden
-        className="pointer-events-none absolute rounded-full"
+        className="absolute rounded-full pointer-events-none flex items-center justify-center"
         style={{
-          top: -3,
-          height: 6,
-          width: BAR_W,
-          x: barX,
-          willChange: "transform",
+          top: circleTop,
+          width: CIRCLE_D,
+          height: CIRCLE_D,
+          x: circleX,
           background: gradient,
           opacity: ready ? 1 : 0,
-          boxShadow: `0 0 8px 1px ${beamColor}88`,
-        }}
-      />
-
-      {/* ---- light beam / cone ---- */}
-      {/* box is sized to the wider of the two ends, so the cone can
-          either flare out OR converge (like a real spotlight narrowing
-          onto the icon) without getting clipped by its own box.
-          clip-path is a static shape here (only `x` animates), so it can
-          stay on the compositor as long as it gets its own layer — hence
-          willChange below. */}
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute"
-        style={{
-          top: 0,
-          height: 58,
-          width: BEAM_BOX_W,
-          x: beamX,
+          boxShadow: `0 6px 18px -2px ${beamColor}99, 0 0 0 1px rgba(255,255,255,0.06)`,
           willChange: "transform",
-          opacity: ready ? 1 : 0,
-          clipPath: `polygon(${TOP_LEFT}px 0, ${TOP_RIGHT}px 0, ${BOTTOM_RIGHT}px 100%, ${BOTTOM_LEFT}px 100%)`,
-          background: `linear-gradient(180deg, ${accentFrom}66 0%, ${accentTo}22 60%, transparent 100%)`,
         }}
-      />
+      >
+        {activeIndex !== -1 &&
+          (() => {
+            const ActiveIcon = items[activeIndex].icon;
+            return (
+              <motion.span
+                key={activeId}
+                initial={{ scale: 0.4, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                style={{ color: iconColorActive, display: "flex" }}
+              >
+                <ActiveIcon size={24} strokeWidth={2.4} />
+              </motion.span>
+            );
+          })()}
+      </motion.div>
 
-      {/* ---- nav items ---- */}
-      {items.map((item) => {
-        const Icon = item.icon;
-        const isActive = item.id === activeId;
-        return (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => onChange(item.id)}
-            className="relative z-10 flex-1 flex items-center justify-center outline-none"
-            style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}
-            aria-label={item.label}
-            aria-current={isActive ? "page" : undefined}
+      {/* ---- label nama menu, hanya muncul untuk item yang sedang aktif ----
+          x mengikuti posisi ikon aktif (labelX, sama seperti lingkaran),
+          dan posisinya di dekat bagian bawah tab — bukan di tengah-tengah. */}
+      {activeIndex !== -1 && (
+        <motion.div
+          key={activeId}
+          className="absolute pointer-events-none flex items-center justify-center"
+          style={{
+            top: BAR_H - 30,
+            x: labelX,
+            translateX: "-50%",
+            whiteSpace: "nowrap",
+          }}
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 24 }}
+        >
+          <span
+            className="text-[11px] font-medium"
+            style={{ color: iconColorActive }}
           >
-            <motion.span
-              animate={{
-                scale: isActive ? 1.08 : 1,
-                color: isActive ? iconColorActive : iconColorInactive,
-              }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            {items[activeIndex].label}
+          </span>
+        </motion.div>
+      )}
+
+      {/* ---- inactive icons + tap targets, sitting inside the pill ---- */}
+      <div
+        className="absolute left-0 right-0 bottom-0 flex items-stretch"
+        style={{ height: PILL_H }}
+      >
+        {items.map((item) => {
+          const Icon = item.icon;
+          const isActive = item.id === activeId;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => onChange(item.id)}
+              className="relative z-10 flex-1 flex items-center justify-center outline-none"
+              style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}
+              aria-label={item.label}
+              aria-current={isActive ? "page" : undefined}
             >
-              <Icon size={24} strokeWidth={2.2} fill={isActive ? iconColorActive : "none"} />
-            </motion.span>
-          </button>
-        );
-      })}
+              <motion.span
+                animate={{ opacity: isActive ? 0 : 1, scale: isActive ? 0.6 : 1 }}
+                transition={{ type: "spring", stiffness: 300, damping: 22 }}
+                style={{ color: iconColorInactive }}
+              >
+                <Icon size={22} strokeWidth={2.2} />
+              </motion.span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
