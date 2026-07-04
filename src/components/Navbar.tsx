@@ -238,7 +238,6 @@ export default function Navbar() {
           }}
           surfaceColor="rgba(42,42,48,0.92)"
           borderColor="rgba(255,255,255,0.08)"
-          cornerRadius={14}
           iconColorInactive="rgba(255,255,255,0.4)"
           iconColorActive="#ff9142"
           beamColor="#ff9142"
