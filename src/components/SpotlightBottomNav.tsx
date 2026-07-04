@@ -27,6 +27,8 @@ interface SpotlightBottomNavProps {
   activeId: string;
   onChange: (id: string) => void;
   surfaceColor?: string;
+  borderColor?: string;
+  cornerRadius?: number;
   iconColorInactive?: string;
   iconColorActive?: string;
   beamColor?: string;
@@ -35,22 +37,39 @@ interface SpotlightBottomNavProps {
   springConfig?: SpringConfig;
 }
 
-// Kotak (siku) dengan lembah/dip di tengah atas — sama seperti sebelumnya,
-// tapi semua sudut arc (rounded) diganti garis lurus supaya bar-nya kotak
-// tegas, bukan pill.
-function buildPillPath(w: number, h: number, cx: number, dipWidth: number, dipDepth: number) {
-  const left = Math.max(cx - dipWidth / 2, 4);
-  const right = Math.min(cx + dipWidth / 2, w - 4);
+// Bar dengan lembah/dip di tengah atas. Sudut luar bisa kotak tegas
+// (cornerRadius = 0) atau sedikit membulat (cornerRadius > 0).
+function buildPillPath(
+  w: number,
+  h: number,
+  cx: number,
+  dipWidth: number,
+  dipDepth: number,
+  cornerRadius: number
+) {
+  const r = Math.max(0, Math.min(cornerRadius, h / 2));
+  const left = Math.max(cx - dipWidth / 2, r + 4);
+  const right = Math.min(cx + dipWidth / 2, w - r - 4);
   const c = dipWidth * 0.28;
 
+  const topRightCorner = r > 0 ? `A ${r} ${r} 0 0 1 ${w} ${r}` : `L ${w} 0`;
+  const bottomRightCorner = r > 0 ? `A ${r} ${r} 0 0 1 ${w - r} ${h}` : `L ${w} ${h}`;
+  const bottomLeftCorner = r > 0 ? `A ${r} ${r} 0 0 1 0 ${h - r}` : `L 0 ${h}`;
+  const topLeftCorner = r > 0 ? `A ${r} ${r} 0 0 1 ${r} 0` : `L 0 0`;
+
   return [
-    `M 0 0`,
+    `M ${r} 0`,
     `L ${left} 0`,
     `C ${left + c} 0, ${cx - c} ${dipDepth}, ${cx} ${dipDepth}`,
     `C ${cx + c} ${dipDepth}, ${right - c} 0, ${right} 0`,
-    `L ${w} 0`,
-    `L ${w} ${h}`,
-    `L 0 ${h}`,
+    `L ${w - r} 0`,
+    topRightCorner,
+    `L ${w} ${h - r}`,
+    bottomRightCorner,
+    `L ${r} ${h}`,
+    bottomLeftCorner,
+    `L 0 ${r}`,
+    topLeftCorner,
     "Z",
   ].join(" ");
 }
@@ -62,6 +81,8 @@ export default function SpotlightBottomNav({
   // Diganti dari hitam ke abu-abu gelap netral, supaya kelihatan sebagai
   // elemen terpisah di atas background page yang full hitam.
   surfaceColor = "#1c1c22",
+  borderColor = "transparent",
+  cornerRadius = 0,
   iconColorInactive = "rgba(255,255,255,0.45)",
   iconColorActive = "#fff",
   beamColor = "#ff9142",
@@ -113,7 +134,7 @@ export default function SpotlightBottomNav({
     if (pathRef.current && containerWidth) {
       pathRef.current.setAttribute(
         "d",
-        buildPillPath(containerWidth, PILL_H, latest, DIP_WIDTH, DIP_DEPTH)
+        buildPillPath(containerWidth, PILL_H, latest, DIP_WIDTH, DIP_DEPTH, cornerRadius)
       );
     }
   });
@@ -135,7 +156,7 @@ export default function SpotlightBottomNav({
       if (pathRef.current) {
         pathRef.current.setAttribute(
           "d",
-          buildPillPath(containerWidth, PILL_H, nextCenter, DIP_WIDTH, DIP_DEPTH)
+          buildPillPath(containerWidth, PILL_H, nextCenter, DIP_WIDTH, DIP_DEPTH, cornerRadius)
         );
       }
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -148,14 +169,20 @@ export default function SpotlightBottomNav({
 
   return (
     <div ref={containerRef} className="relative w-full select-none" style={{ height: BAR_H }}>
-      {/* ---- bar kotak (tidak melengkung) dengan dip/valley di top edge ---- */}
+      {/* ---- bar dengan dip/valley di top edge ---- */}
       <svg
         className="absolute left-0 right-0 bottom-0"
         width="100%"
         height={PILL_H}
         style={{ overflow: "visible" }}
       >
-        <path ref={pathRef} d={containerWidth ? buildPillPath(containerWidth, PILL_H, containerWidth / 2, DIP_WIDTH, DIP_DEPTH) : ""} fill={surfaceColor} />
+        <path
+          ref={pathRef}
+          d={containerWidth ? buildPillPath(containerWidth, PILL_H, containerWidth / 2, DIP_WIDTH, DIP_DEPTH, cornerRadius) : ""}
+          fill={surfaceColor}
+          stroke={borderColor}
+          strokeWidth={1}
+        />
       </svg>
 
       {/* ---- floating orange circle, separated from the valley by a gap ---- */}
