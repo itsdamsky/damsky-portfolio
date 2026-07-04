@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useLayoutEffect, useCallback } from "react";
+import { useRef, useState, useLayoutEffect } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 
@@ -44,7 +44,7 @@ export default function SpotlightBottomNav({
   springConfig = { stiffness: 260, damping: 24, mass: 1 },
 }: SpotlightBottomNavProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const itemRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const [containerWidth, setContainerWidth] = useState(0);
   const [ready, setReady] = useState(false);
 
   // center-x of the active icon, relative to container (clamped so the
@@ -71,36 +71,54 @@ export default function SpotlightBottomNav({
   const barX = useTransform(center, (v) => v - BAR_W / 2);
   const beamX = useTransform(center, (v) => v - BEAM_BOX_W / 2);
 
-  const measure = useCallback(() => {
+  // Measure the container's width once (and on resize) via ResizeObserver,
+  // instead of calling getBoundingClientRect() on every single tab switch.
+  // getBoundingClientRect() forces a synchronous layout reflow — and the
+  // old code ran it exactly when a tab changed, which is the same instant
+  // React is mounting/laying out the new page. Two forced-layout passes
+  // stacked on the same tick is what read as jank right on tap, separate
+  // from whatever the destination page itself was doing.
+  useLayoutEffect(() => {
     const container = containerRef.current;
-    const el = itemRefs.current[activeId];
-    if (!container || !el) return;
+    if (!container) return;
 
-    const containerBox = container.getBoundingClientRect();
-    const elBox = el.getBoundingClientRect();
-    let nextCenter = elBox.left - containerBox.left + elBox.width / 2;
+    setContainerWidth(container.getBoundingClientRect().width);
+
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setContainerWidth(entry.contentRect.width);
+      }
+    });
+    ro.observe(container);
+    return () => ro.disconnect();
+  }, []);
+
+  // All nav items are equal-width flex-1 children of the same container,
+  // so the active item's center can be computed with plain arithmetic —
+  // no DOM measurement, no reflow — every time the active tab changes.
+  const activeIndex = items.findIndex((it) => it.id === activeId);
+
+  useLayoutEffect(() => {
+    if (!containerWidth || activeIndex === -1) return;
+
+    const itemWidth = containerWidth / items.length;
+    let nextCenter = itemWidth * activeIndex + itemWidth / 2;
 
     // keep the bar fully inside the pill, clear of its rounded corners
     const margin = BAR_W / 2 + 12;
-    nextCenter = Math.min(
-      Math.max(nextCenter, margin),
-      containerBox.width - margin
-    );
+    nextCenter = Math.min(Math.max(nextCenter, margin), containerWidth - margin);
 
     targetCenter.set(nextCenter);
     if (!ready) {
       center.jump(nextCenter);
+      // One-time initialization: jump to the first position instantly
+      // (no spring animation) so the bar doesn't slide in from 0 on first
+      // paint, then flip `ready` so subsequent tab changes animate normally.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setReady(true);
     }
-  }, [activeId, ready, targetCenter, center]);
-
-  useLayoutEffect(() => {
-    measure();
-    const onResize = () => measure();
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeId, items.length]);
+  }, [activeIndex, containerWidth, items.length]);
 
   const gradient = `linear-gradient(90deg, ${accentFrom}, ${accentTo})`;
 
@@ -155,9 +173,6 @@ export default function SpotlightBottomNav({
         return (
           <button
             key={item.id}
-            ref={(el) => {
-              itemRefs.current[item.id] = el;
-            }}
             type="button"
             onClick={() => onChange(item.id)}
             className="relative z-10 flex-1 flex items-center justify-center outline-none"

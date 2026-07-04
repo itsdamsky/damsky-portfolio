@@ -133,7 +133,7 @@ export default function Hero() {
             </div>
             {/* Stats card — overlap foto bagian bawah */}
             <div className="relative z-30 w-full -mt-16 px-4">
-              <div className="flex items-center rounded-2xl border border-white/10 bg-white/5 px-5 py-5 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
+              <div className="flex items-center rounded-2xl border border-white/10 bg-black/60 px-5 py-5 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
                 {/* Kiri: avatar + years */}
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-lg shrink-0">👤</div>
@@ -159,7 +159,7 @@ export default function Hero() {
               Hi, I&apos;m <span className="text-orange-500 font-medium">Adam Maulana</span> 👋
             </p>
             <h1 className="text-[2rem] font-bold leading-[1.1] mb-4">
-              <div className="text-white min-h-[2.6em] h-[2.6em]">
+              <div className="text-white min-h-[1.2em] h-[1.2em]">
                 {display1}
                 {display2.length === 0 && (
                   <span className="inline-block ml-1 w-[2px] h-[0.9em] bg-white animate-pulse align-bottom" />
@@ -331,16 +331,22 @@ export default function Hero() {
                 </div>
 
                 <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-5xl px-4 sm:px-6 z-20">
-                  <div className="relative flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-5 sm:p-6 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.4)] md:flex-row md:items-center md:justify-between">
-                    <div className="flex items-center gap-4">
+                  <div className="relative flex flex-col gap-6 rounded-3xl border border-white/10 bg-black/60 p-5 sm:p-6 backdrop-blur-md shadow-[0_10px_40px_rgba(0,0,0,0.4)] md:flex-row md:items-center md:justify-between overflow-hidden">
+                    {/* Extra black fade layered over the translucent card
+                        itself — the orange glow behind the card was still
+                        bleeding through backdrop-blur, strongest toward the
+                        bottom. This sits behind the content (first in DOM
+                        order) so text still renders on top of it. */}
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent to-black/80" />
+                    <div className="relative flex items-center gap-4">
                       <div className="w-14 h-14 bg-orange-500 rounded-full flex items-center justify-center text-lg">👤</div>
                       <div>
                         <p className="text-2xl font-medium text-white"><Counter target={3} suffix="+" /></p>
                         <p className="text-sm text-gray-400">Years Experience</p>
                       </div>
                     </div>
-                    <div className="w-full h-px bg-white/10 md:w-[1px] md:h-12 md:bg-white/10" />
-                    <div>
+                    <div className="relative w-full h-px bg-white/10 md:w-[1px] md:h-12 md:bg-white/10" />
+                    <div className="relative">
                       <p className="text-2xl font-medium text-white"><Counter target={10} suffix="+" /></p>
                       <p className="text-sm text-gray-400">Projects Completed</p>
                     </div>
