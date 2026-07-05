@@ -172,7 +172,7 @@ export default function Hero() {
                   </div>
                 </div>
                 {/* Divider */}
-                <div className="w-px h-12 bg-white/10 mx-3 shrink-0" />
+                <div className="w-px h-12 bg-white/10 ml-6 mr-3 shrink-0" />
                 {/* Kanan: projects */}
                 <div className="flex-1 min-w-0 pl-6">
                   <p className="text-2xl font-semibold text-white leading-none"><Counter target={10} suffix="+" startDelay={350} /></p>
