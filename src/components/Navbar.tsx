@@ -243,7 +243,20 @@ export default function Navbar() {
           beamColor="#ff9142"
           accentFrom="#ff9142"
           accentTo="#e84c00"
-          springConfig={{ stiffness: 260, damping: 24, mass: 1 }}
+          // BUG FIX: lingkaran ini menggambar ulang bentuk SVG bar di
+          // SETIAP frame animasinya (lihat SpotlightBottomNav.tsx). Makin
+          // jauh jarak tempuhnya (paling jauh: dari Skills/Contact ke
+          // Home), makin lama animasi jalan, makin banyak frame yang
+          // harus gambar ulang SVG — itu yang bikin lompatan ke Home
+          // paling gampang kelihatan patah-patah. Stiffness dinaikkan
+          // supaya spring settle lebih cepat, mempersingkat total durasi
+          // (dan jumlah frame) yang perlu redraw, tanpa bikin gerakannya
+          // kelihatan kaku/instan.
+          // BUG FIX: SpotlightBottomNav sekarang pakai CSS transition
+          // murni (bukan lagi framer-motion spring per-frame), supaya
+          // gerakannya tidak ikut kena dampak main thread yang sibuk pas
+          // Beranda mounting. transitionMs gantikan springConfig.
+          transitionMs={320}
         />
       </div>
     </>

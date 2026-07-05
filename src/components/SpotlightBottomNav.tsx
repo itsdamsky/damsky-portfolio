@@ -1,25 +1,13 @@
 "use client";
 
-import { useRef, useState, useLayoutEffect } from "react";
-import {
-  motion,
-  useMotionValue,
-  useSpring,
-  useTransform,
-  useMotionValueEvent,
-} from "framer-motion";
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 
 export interface SpotlightNavItem {
   id: string;
   label: string;
   icon: LucideIcon;
-}
-
-interface SpringConfig {
-  stiffness: number;
-  damping: number;
-  mass: number;
 }
 
 interface SpotlightBottomNavProps {
@@ -34,42 +22,29 @@ interface SpotlightBottomNavProps {
   beamColor?: string;
   accentFrom?: string;
   accentTo?: string;
-  springConfig?: SpringConfig;
+  // Ganti dari springConfig (framer motion spring, JS-driven per-frame)
+  // ke durasi CSS transition biasa — browser yang menginterpolasikan,
+  // bukan JS yang menghitung ulang di setiap frame.
+  transitionMs?: number;
 }
 
-// Bar dengan lembah/dip di tengah atas. Sudut luar bisa kotak tegas
-// (cornerRadius = 0) atau sedikit membulat (cornerRadius > 0).
-function buildPillPath(
-  w: number,
-  h: number,
-  cx: number,
-  dipWidth: number,
-  dipDepth: number,
-  cornerRadius: number
-) {
-  const r = Math.max(0, Math.min(cornerRadius, h / 2));
-  const left = Math.max(cx - dipWidth / 2, r + 4);
-  const right = Math.min(cx + dipWidth / 2, w - r - 4);
+// Bentuk lekukan/dip, statis — dihitung SEKALI saja (tidak tergantung
+// posisi atau lebar container), lalu digeser dengan CSS transform. Dulu
+// seluruh bentuk bar (termasuk lekukan) dihitung ulang dari nol di setiap
+// frame animasi via `setAttribute("d", ...)`, yang memaksa browser
+// menghitung ulang geometri SVG berulang kali — kerja itu butuh main
+// thread, dan begitu halaman tujuan (Beranda) sibuk me-mount kontennya,
+// keduanya rebutan waktu proses dan animasinya kelihatan patah-patah.
+function buildDipShape(dipWidth: number, dipDepth: number) {
+  const half = dipWidth / 2;
   const c = dipWidth * 0.28;
-
-  const topRightCorner = r > 0 ? `A ${r} ${r} 0 0 1 ${w} ${r}` : `L ${w} 0`;
-  const bottomRightCorner = r > 0 ? `A ${r} ${r} 0 0 1 ${w - r} ${h}` : `L ${w} ${h}`;
-  const bottomLeftCorner = r > 0 ? `A ${r} ${r} 0 0 1 0 ${h - r}` : `L 0 ${h}`;
-  const topLeftCorner = r > 0 ? `A ${r} ${r} 0 0 1 ${r} 0` : `L 0 0`;
-
+  const overflow = 200; // jauh melebihi tinggi bar, supaya area di atas kurva ikut "terhapus" penuh oleh mask
   return [
-    `M ${r} 0`,
-    `L ${left} 0`,
-    `C ${left + c} 0, ${cx - c} ${dipDepth}, ${cx} ${dipDepth}`,
-    `C ${cx + c} ${dipDepth}, ${right - c} 0, ${right} 0`,
-    `L ${w - r} 0`,
-    topRightCorner,
-    `L ${w} ${h - r}`,
-    bottomRightCorner,
-    `L ${r} ${h}`,
-    bottomLeftCorner,
-    `L 0 ${r}`,
-    topLeftCorner,
+    `M ${-half} 0`,
+    `C ${-half + c} 0, ${-c} ${dipDepth}, 0 ${dipDepth}`,
+    `C ${c} ${dipDepth}, ${half - c} 0, ${half} 0`,
+    `L ${half} ${-overflow}`,
+    `L ${-half} ${-overflow}`,
     "Z",
   ].join(" ");
 }
@@ -78,8 +53,6 @@ export default function SpotlightBottomNav({
   items,
   activeId,
   onChange,
-  // Diganti dari hitam ke abu-abu gelap netral, supaya kelihatan sebagai
-  // elemen terpisah di atas background page yang full hitam.
   surfaceColor = "#1c1c22",
   borderColor = "transparent",
   cornerRadius = 0,
@@ -88,35 +61,27 @@ export default function SpotlightBottomNav({
   beamColor = "#ff9142",
   accentFrom = "#ff9142",
   accentTo = "#e84c00",
-  springConfig = { stiffness: 260, damping: 24, mass: 1 },
+  transitionMs = 320,
 }: SpotlightBottomNavProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const pathRef = useRef<SVGPathElement>(null);
+  const maskId = useId();
   const [containerWidth, setContainerWidth] = useState(0);
   const [ready, setReady] = useState(false);
 
   const PILL_H = 76;
-  const BAR_H = 116; // headroom above the pill for the circle to float in
+  const BAR_H = 116;
   const CIRCLE_D = 60;
-  const GAP = 0; // visible gap between the circle's underside and the valley
-  const DIP_DEPTH = 34; // how far the valley pushes down into the pill
-  const DIP_WIDTH = 130; // wide enough that the gap tapers gently, not abruptly
+  const GAP = 0;
+  const DIP_DEPTH = 34;
+  const DIP_WIDTH = 130;
 
-  const targetCenter = useMotionValue(0);
-  const center = useSpring(targetCenter, springConfig);
-  const circleX = useTransform(center, (v) => v - CIRCLE_D / 2);
-  // Posisi X label nama menu ikut center yang sama dengan lingkaran aktif,
-  // supaya teksnya selalu ada di bawah item yang sedang aktif.
-  const labelX = useTransform(center, (v) => v);
-
-  // Circle's vertical position is fixed (it doesn't bounce up/down, only
-  // side to side) — only the pill's valley position animates to track it.
   const circleTop = DIP_DEPTH - GAP - CIRCLE_D / 2;
+
+  const dipShape = useMemo(() => buildDipShape(DIP_WIDTH, DIP_DEPTH), []);
 
   useLayoutEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-
     setContainerWidth(container.getBoundingClientRect().width);
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) setContainerWidth(entry.contentRect.width);
@@ -125,74 +90,87 @@ export default function SpotlightBottomNav({
     return () => ro.disconnect();
   }, []);
 
-  // Redraw the path directly on the DOM node on every spring tick instead
-  // of going through React state — a `d` attribute change can't be
-  // compositor-only like a transform, so keeping it out of React's render
-  // cycle is what keeps this from adding a second, redundant re-render on
-  // top of the unavoidable one.
-  useMotionValueEvent(center, "change", (latest) => {
-    if (pathRef.current && containerWidth) {
-      pathRef.current.setAttribute(
-        "d",
-        buildPillPath(containerWidth, PILL_H, latest, DIP_WIDTH, DIP_DEPTH, cornerRadius)
-      );
-    }
-  });
-
   const activeIndex = items.findIndex((it) => it.id === activeId);
 
-  useLayoutEffect(() => {
-    if (!containerWidth || activeIndex === -1) return;
-
+  const targetCenter = useMemo(() => {
+    if (!containerWidth || activeIndex === -1) return containerWidth / 2;
     const itemWidth = containerWidth / items.length;
-    let nextCenter = itemWidth * activeIndex + itemWidth / 2;
-
+    let next = itemWidth * activeIndex + itemWidth / 2;
     const margin = DIP_WIDTH / 2 + 4;
-    nextCenter = Math.min(Math.max(nextCenter, margin), containerWidth - margin);
+    next = Math.min(Math.max(next, margin), containerWidth - margin);
+    return next;
+  }, [containerWidth, activeIndex, items.length]);
 
-    targetCenter.set(nextCenter);
-    if (!ready) {
-      center.jump(nextCenter);
-      if (pathRef.current) {
-        pathRef.current.setAttribute(
-          "d",
-          buildPillPath(containerWidth, PILL_H, nextCenter, DIP_WIDTH, DIP_DEPTH, cornerRadius)
-        );
-      }
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setReady(true);
+  // Posisi pertama kali (saat width baru terukur) di-"jump" tanpa
+  // transition, supaya tidak meluncur dari kiri layar pas halaman baru
+  // dibuka. Baru setelah itu transition dinyalakan untuk perpindahan
+  // berikutnya.
+  useEffect(() => {
+    if (containerWidth && !ready) {
+      const id = requestAnimationFrame(() => setReady(true));
+      return () => cancelAnimationFrame(id);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeIndex, containerWidth, items.length]);
+  }, [containerWidth, ready]);
 
   const gradient = `linear-gradient(135deg, ${accentFrom}, ${accentTo})`;
 
+  const transitionStyle = ready
+    ? `transform ${transitionMs}ms cubic-bezier(0.34, 1.56, 0.64, 1)`
+    : "none";
+
   return (
-    <div ref={containerRef} className="relative w-full select-none" style={{ height: BAR_H }}>
-      {/* ---- bar dengan dip/valley di top edge ---- */}
+    <div
+      ref={containerRef}
+      className="relative w-full select-none"
+      style={{ height: BAR_H, contain: "layout paint" }}
+    >
+      {/* ---- bar dengan lekukan, sekarang lewat SVG mask + CSS transform ---- */}
       <svg
         className="absolute left-0 right-0 bottom-0"
         width="100%"
         height={PILL_H}
         style={{ overflow: "visible" }}
       >
-        <path
-          ref={pathRef}
-          d={containerWidth ? buildPillPath(containerWidth, PILL_H, containerWidth / 2, DIP_WIDTH, DIP_DEPTH, cornerRadius) : ""}
+        <defs>
+          <mask
+            id={maskId}
+            maskUnits="userSpaceOnUse"
+            x={0}
+            y={-200}
+            width={containerWidth || 1}
+            height={PILL_H + 200}
+          >
+            <rect x={0} y={-200} width={containerWidth || 0} height={PILL_H + 200} fill="white" />
+            <g style={{ transform: `translateX(${targetCenter}px)`, transition: transitionStyle }}>
+              <path d={dipShape} fill="black" />
+            </g>
+          </mask>
+        </defs>
+        <rect
+          x={0}
+          y={0}
+          width={containerWidth || 0}
+          height={PILL_H}
+          rx={cornerRadius}
+          ry={cornerRadius}
           fill={surfaceColor}
           stroke={borderColor}
           strokeWidth={1}
+          mask={`url(#${maskId})`}
         />
       </svg>
 
-      {/* ---- floating orange circle, separated from the valley by a gap ---- */}
-      <motion.div
+      {/* ---- floating orange circle — posisi digerakkan lewat CSS
+          transition di `transform`, bukan lagi JS spring per-frame ---- */}
+      <div
         className="absolute rounded-full pointer-events-none flex items-center justify-center"
         style={{
           top: circleTop,
           width: CIRCLE_D,
           height: CIRCLE_D,
-          x: circleX,
+          left: 0,
+          transform: `translateX(${targetCenter - CIRCLE_D / 2}px)`,
+          transition: transitionStyle,
           background: gradient,
           opacity: ready ? 1 : 0,
           boxShadow: `0 6px 18px -2px ${beamColor}99, 0 0 0 1px rgba(255,255,255,0.06)`,
@@ -214,34 +192,35 @@ export default function SpotlightBottomNav({
               </motion.span>
             );
           })()}
-      </motion.div>
+      </div>
 
-      {/* ---- label nama menu, hanya muncul untuk item yang sedang aktif ----
-          x mengikuti posisi ikon aktif (labelX, sama seperti lingkaran),
-          dan posisinya di dekat bagian bawah tab — bukan di tengah-tengah. */}
-      {activeIndex !== -1 && (
-        <motion.div
-          key={activeId}
-          className="absolute pointer-events-none flex items-center justify-center"
-          style={{
-            top: BAR_H - 30,
-            x: labelX,
-            translateX: "-50%",
-            whiteSpace: "nowrap",
-          }}
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0 }}
-          transition={{ type: "spring", stiffness: 300, damping: 24 }}
-        >
-          <span
-            className="text-[11px] font-medium"
+      {/* ---- label nama menu — wrapper posisi pakai CSS transition,
+          isi di dalamnya (fade+pop kecil) tetap pakai framer motion
+          karena itu animasi lokal singkat, bukan animasi posisi
+          berkelanjutan yang butuh redraw tiap frame ---- */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: BAR_H - 30,
+          left: 0,
+          transform: `translateX(${targetCenter}px) translateX(-50%)`,
+          transition: transitionStyle,
+          whiteSpace: "nowrap",
+        }}
+      >
+        {activeIndex !== -1 && (
+          <motion.span
+            key={activeId}
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 24 }}
+            className="text-[11px] font-medium inline-block"
             style={{ color: iconColorActive }}
           >
             {items[activeIndex].label}
-          </span>
-        </motion.div>
-      )}
+          </motion.span>
+        )}
+      </div>
 
       {/* ---- inactive icons + tap targets, sitting inside the pill ---- */}
       <div
