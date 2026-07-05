@@ -5,11 +5,18 @@ import { useEffect, useState, useMemo } from "react";
 interface CounterProps {
   target: number;
   suffix?: string;
+  // Opsional — delay sebelum animasi hitung mulai jalan. Default 0 (jalan
+  // langsung, perilaku lama, dipakai di halaman yang gak masalah seperti
+  // About/Skills). Hero.tsx mengisi ini supaya rAF loop counter tidak
+  // mulai kerja tepat di momen yang sama dengan animasi transisi halaman
+  // + lingkaran bottom nav yang lagi settle ke posisi Home.
+  startDelay?: number;
 }
 
 export default function Counter({
   target,
   suffix = "",
+  startDelay = 0,
 }: CounterProps) {
 
   const [count, setCount] = useState(0);
@@ -26,6 +33,7 @@ export default function Counter({
     // update to the browser's own render cycle instead, so it never fires
     // more than needed and never fights the transition for the main thread.
     let rafId: number;
+    let startTimeoutId: ReturnType<typeof setTimeout> | undefined;
     let startTime: number | null = null;
     const duration = animationDuration;
 
@@ -41,10 +49,21 @@ export default function Counter({
       }
     };
 
-    rafId = requestAnimationFrame(tick);
+    const start = () => {
+      rafId = requestAnimationFrame(tick);
+    };
 
-    return () => cancelAnimationFrame(rafId);
-  }, [target, animationDuration]);
+    if (startDelay > 0) {
+      startTimeoutId = setTimeout(start, startDelay);
+    } else {
+      start();
+    }
+
+    return () => {
+      if (startTimeoutId) clearTimeout(startTimeoutId);
+      cancelAnimationFrame(rafId);
+    };
+  }, [target, animationDuration, startDelay]);
 
   return (
     <span>

@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Mail, Phone, MapPin } from "lucide-react";
+import ScrollReveal from "@/components/ScrollReveal";
 
 export default function ContactSection() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -87,132 +88,144 @@ export default function ContactSection() {
     <section className="relative min-h-screen py-26 overflow-hidden">
       <div className="container-custom">
         {/* Header */}
-        <div className="mb-10">
-          <p className="text-xs tracking-[3px] text-orange-500 mb-3">GET IN TOUCH</p>
-          <h1 className="text-4xl md:text-5xl font-semibold text-white mb-4">
-            Let&apos;s work <span className="text-orange-500">together.</span>
-          </h1>
-          <p className="text-neutral-400 max-w-xl">
-            Have a project in mind or just want to say hi? Fill out the form or reach out directly — I&apos;ll get back to you as soon as possible.
-          </p>
-        </div>
+        <ScrollReveal>
+          <div className="mb-10">
+            <p className="text-xs tracking-[3px] text-orange-500 mb-3">GET IN TOUCH</p>
+            <h1 className="text-4xl md:text-5xl font-semibold text-white mb-4">
+              Let&apos;s work <span className="text-orange-500">together.</span>
+            </h1>
+            <p className="text-neutral-400 max-w-xl">
+              Have a project in mind or just want to say hi? Fill out the form or reach out directly — I&apos;ll get back to you as soon as possible.
+            </p>
+          </div>
+        </ScrollReveal>
 
         <div className="grid md:grid-cols-2 gap-12 items-start">
 
           {/* Kiri - Info kontak */}
           <div className="flex flex-col gap-6">
             {/* Contact cards */}
-            {contactInfo.map((info, i) => (
-              <div key={i} className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl px-5 py-4 hover:border-orange-500/40 transition-all duration-300">
-                <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-orange-500/10 text-orange-500 shrink-0">
-                  {info.icon}
-                </div>
-                <div>
-                  <p className="text-xs text-neutral-500 mb-0.5">{info.label}</p>
-                  {info.href ? (
-                    <a href={info.href} target="_blank" rel="noopener noreferrer" className="text-sm text-white hover:text-orange-500 transition">
-                      {info.value}
-                    </a>
-                  ) : (
-                    <p className="text-sm text-white">{info.value}</p>
-                  )}
-                </div>
-              </div>
-            ))}
-
-            {/* Social media */}
-            <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-4">
-              <p className="text-xs text-neutral-500 mb-4">FOLLOW ME</p>
-              <div className="flex items-center gap-3">
-                {socials.map((social, i) => (
-                <a
-                    key={i}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-neutral-400 hover:text-white hover:border-orange-500/40 transition-all duration-300"
-                >
-                    {social.icon}
-                </a>
+            <ScrollReveal delay={0.05}>
+              <div className="flex flex-col gap-6">
+                {contactInfo.map((info, i) => (
+                  <div key={i} className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl px-5 py-4 hover:border-orange-500/40 transition-all duration-300">
+                    <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-orange-500/10 text-orange-500 shrink-0">
+                      {info.icon}
+                    </div>
+                    <div>
+                      <p className="text-xs text-neutral-500 mb-0.5">{info.label}</p>
+                      {info.href ? (
+                        <a href={info.href} target="_blank" rel="noopener noreferrer" className="text-sm text-white hover:text-orange-500 transition">
+                          {info.value}
+                        </a>
+                      ) : (
+                        <p className="text-sm text-white">{info.value}</p>
+                      )}
+                    </div>
+                  </div>
                 ))}
               </div>
-            </div>
+            </ScrollReveal>
+
+            {/* Social media */}
+            <ScrollReveal delay={0.1}>
+              <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-4">
+                <p className="text-xs text-neutral-500 mb-4">FOLLOW ME</p>
+                <div className="flex items-center gap-3">
+                  {socials.map((social, i) => (
+                  <a
+                      key={i}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-neutral-400 hover:text-white hover:border-orange-500/40 transition-all duration-300"
+                  >
+                      {social.icon}
+                  </a>
+                  ))}
+                </div>
+              </div>
+            </ScrollReveal>
 
             {/* Available badge */}
-            <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-5 py-4">
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              <p className="text-sm text-white">Available for freelance projects</p>
-            </div>
+            <ScrollReveal delay={0.15}>
+              <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-5 py-4">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <p className="text-sm text-white">Available for freelance projects</p>
+              </div>
+            </ScrollReveal>
           </div>
 
           {/* Kanan - Form */}
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-            <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-4">
-              
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-neutral-400">Your Name</label>
-                <input
-                  type="text"
-                  name="from_name"
-                  required
-                  placeholder="John Doe"
-                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-orange-500/50 transition-all duration-300"
-                />
-              </div>
+          <ScrollReveal delay={0.1} direction="left">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+              <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-4">
 
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-neutral-400">Email Address</label>
-                <input
-                  type="email"
-                  name="from_email"
-                  required
-                  placeholder="john@example.com"
-                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-orange-500/50 transition-all duration-300"
-                />
-              </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs text-neutral-400">Your Name</label>
+                  <input
+                    type="text"
+                    name="from_name"
+                    required
+                    placeholder="John Doe"
+                    className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-orange-500/50 transition-all duration-300"
+                  />
+                </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-neutral-400">Subject</label>
-                <input
-                  type="text"
-                  name="subject"
-                  required
-                  placeholder="Project collaboration"
-                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-orange-500/50 transition-all duration-300"
-                />
-              </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs text-neutral-400">Email Address</label>
+                  <input
+                    type="email"
+                    name="from_email"
+                    required
+                    placeholder="john@example.com"
+                    className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-orange-500/50 transition-all duration-300"
+                  />
+                </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-neutral-400">Message</label>
-                <textarea
-                  name="message"
-                  required
-                  rows={5}
-                  placeholder="Tell me about your project..."
-                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-orange-500/50 transition-all duration-300 resize-none"
-                />
-              </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs text-neutral-400">Subject</label>
+                  <input
+                    type="text"
+                    name="subject"
+                    required
+                    placeholder="Project collaboration"
+                    className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-orange-500/50 transition-all duration-300"
+                  />
+                </div>
 
-              <button
-                type="submit"
-                disabled={status === "loading"}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium py-3 rounded-xl transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed mt-2"
-              >
-                {status === "loading" ? "Sending..." : "Send Message →"}
-              </button>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs text-neutral-400">Message</label>
+                  <textarea
+                    name="message"
+                    required
+                    rows={5}
+                    placeholder="Tell me about your project..."
+                    className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-orange-500/50 transition-all duration-300 resize-none"
+                  />
+                </div>
 
-              {status === "success" && (
-                <p className="text-green-500 text-sm text-center">
-                  ✓ Message sent! I&apos;ll get back to you soon.
-                </p>
-              )}
-              {status === "error" && (
-                <p className="text-red-500 text-sm text-center">
-                  Something went wrong. Please try again.
-                </p>
-              )}
-            </form>
-          </div>
+                <button
+                  type="submit"
+                  disabled={status === "loading"}
+                  className="w-full bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium py-3 rounded-xl transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+                >
+                  {status === "loading" ? "Sending..." : "Send Message →"}
+                </button>
+
+                {status === "success" && (
+                  <p className="text-green-500 text-sm text-center">
+                    ✓ Message sent! I&apos;ll get back to you soon.
+                  </p>
+                )}
+                {status === "error" && (
+                  <p className="text-red-500 text-sm text-center">
+                    Something went wrong. Please try again.
+                  </p>
+                )}
+              </form>
+            </div>
+          </ScrollReveal>
         </div>
       </div>
     </section>

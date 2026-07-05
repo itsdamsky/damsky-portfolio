@@ -167,7 +167,7 @@ export default function Hero() {
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                   <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-lg shrink-0">👤</div>
                   <div className="min-w-0">
-                    <p className="text-2xl font-semibold text-white leading-none"><Counter target={3} suffix="+" /></p>
+                    <p className="text-2xl font-semibold text-white leading-none"><Counter target={3} suffix="+" startDelay={350} /></p>
                     <p className="text-xs text-gray-400 mt-1 whitespace-nowrap">Years Experience</p>
                   </div>
                 </div>
@@ -175,7 +175,7 @@ export default function Hero() {
                 <div className="w-px h-12 bg-white/10 mx-3 shrink-0" />
                 {/* Kanan: projects */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-2xl font-semibold text-white leading-none"><Counter target={10} suffix="+" /></p>
+                  <p className="text-2xl font-semibold text-white leading-none"><Counter target={10} suffix="+" startDelay={350} /></p>
                   <p className="text-xs text-gray-400 mt-1 whitespace-nowrap">Projects Completed</p>
                 </div>
               </div>
