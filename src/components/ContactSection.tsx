@@ -85,8 +85,6 @@ export default function ContactSection() {
 
   return (
     <section className="relative min-h-screen py-32 overflow-hidden">
-      <div className="absolute top-1/3 right-0 w-[400px] h-[400px] bg-orange-500/5 rounded-full blur-[100px] pointer-events-none" />
-
       <div className="container-custom">
         {/* Header */}
         <div className="mb-16">
