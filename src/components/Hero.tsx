@@ -16,14 +16,25 @@ export default function Hero() {
   const [dots, setDots] = useState<Dot[]>([]);
 
   useEffect(() => {
-    setDots(
-      [...Array(20)].map(() => ({
-        top: Math.random() * 100,
-        left: Math.random() * 100,
-        duration: 6 + Math.random() * 6,
-        delay: Math.random() * 5,
-      }))
-    );
+    // BUG FIX: sebelumnya effect ini jalan LANGSUNG pas Hero di-mount —
+    // yaitu persis di window waktu yang sama dengan animasi page-transition
+    // (180ms) dan animasi lingkaran di bottom nav. Kalau semuanya numpuk di
+    // momen yang sama, main thread sempat macet sebentar dan itu yang
+    // kelihatan sebagai "patah-patah" pas pindah ke Beranda spesifik (
+    // halaman lain gak punya kerjaan mount sebanyak ini). Delay kecil di
+    // sini memberi ruang transisi halaman selesai duluan sebelum Hero
+    // mulai kerja berat.
+    const id = setTimeout(() => {
+      setDots(
+        [...Array(20)].map(() => ({
+          top: Math.random() * 100,
+          left: Math.random() * 100,
+          duration: 6 + Math.random() * 6,
+          delay: Math.random() * 5,
+        }))
+      );
+    }, 200);
+    return () => clearTimeout(id);
   }, []);
 
   const text1 = "Graphic Designer &";
@@ -37,41 +48,49 @@ export default function Hero() {
   const phase = useRef<"line1" | "line2" | "pause" | "delete">("line1");
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (phase.current === "line1") {
-        const next = text1.slice(0, i1.current + 1);
-        setDisplay1(next);
-        i1.current++;
-        if (i1.current === text1.length) {
-          phase.current = "line2";
-          i2.current = 0;
-          setDisplay2("");
+    // Sama seperti dots di atas — ditunda 200ms supaya tidak mulai
+    // "mengetik" tepat di tengah-tengah animasi transisi halaman.
+    let interval: ReturnType<typeof setInterval>;
+    const startId = setTimeout(() => {
+      interval = setInterval(() => {
+        if (phase.current === "line1") {
+          const next = text1.slice(0, i1.current + 1);
+          setDisplay1(next);
+          i1.current++;
+          if (i1.current === text1.length) {
+            phase.current = "line2";
+            i2.current = 0;
+            setDisplay2("");
+          }
+        } else if (phase.current === "line2") {
+          const next = text2.slice(0, i2.current + 1);
+          setDisplay2(next);
+          i2.current++;
+          if (i2.current === text2.length) {
+            phase.current = "pause";
+            setTimeout(() => { phase.current = "delete"; }, 1200);
+          }
+        } else if (phase.current === "delete") {
+          if (i2.current > 0) {
+            i2.current--;
+            setDisplay2(text2.slice(0, i2.current));
+          } else if (i1.current > 0) {
+            i1.current--;
+            setDisplay1(text1.slice(0, i1.current));
+          } else {
+            phase.current = "line1";
+            i1.current = 0;
+            i2.current = 0;
+            setDisplay1("");
+            setDisplay2("");
+          }
         }
-      } else if (phase.current === "line2") {
-        const next = text2.slice(0, i2.current + 1);
-        setDisplay2(next);
-        i2.current++;
-        if (i2.current === text2.length) {
-          phase.current = "pause";
-          setTimeout(() => { phase.current = "delete"; }, 1200);
-        }
-      } else if (phase.current === "delete") {
-        if (i2.current > 0) {
-          i2.current--;
-          setDisplay2(text2.slice(0, i2.current));
-        } else if (i1.current > 0) {
-          i1.current--;
-          setDisplay1(text1.slice(0, i1.current));
-        } else {
-          phase.current = "line1";
-          i1.current = 0;
-          i2.current = 0;
-          setDisplay1("");
-          setDisplay2("");
-        }
-      }
-    }, 120);
-    return () => clearInterval(interval);
+      }, 120);
+    }, 200);
+    return () => {
+      clearTimeout(startId);
+      clearInterval(interval);
+    };
   }, []);
 
   return (
