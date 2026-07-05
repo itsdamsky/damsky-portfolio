@@ -33,7 +33,7 @@ export default function Hero() {
           delay: Math.random() * 5,
         }))
       );
-    }, 200);
+    }, 350);
     return () => clearTimeout(id);
   }, []);
 
@@ -86,7 +86,7 @@ export default function Hero() {
           }
         }
       }, 120);
-    }, 200);
+    }, 350);
     return () => {
       clearTimeout(startId);
       clearInterval(interval);
