@@ -326,7 +326,7 @@ export default function Hero() {
                   >
                     View My Work ↗
                   </Link>
-                  <a href="/files/cv-adam.pdf" download
+                  <a href="/files/Adam-Maulana-CV.pdf" download
                     className="w-full sm:w-auto px-6 py-3 rounded-xl border border-orange-500/40 bg-black/40 backdrop-blur-md hover:bg-orange-500/10 transition text-center">
                     Download CV ↓
                   </a>

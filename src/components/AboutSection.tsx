@@ -92,7 +92,7 @@ export default function About() {
                       View My Work ↗
                     </Link>
                 <a
-                  href="/cv/Adam_Maulana_CV.pdf"
+                  href="/files/Adam-Maulana-CV.pdf"
                   download
                   className="text-sm text-white bg-orange-500 px-5 py-2.5 rounded-full hover:bg-orange-600 transition-all duration-300"
                 >
