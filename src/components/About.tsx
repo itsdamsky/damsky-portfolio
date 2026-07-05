@@ -83,8 +83,14 @@ export default function About() {
                   <div className="absolute inset-0 bg-black/40" />
                 </div>
 
-                {/* Card mobile */}
-                <div className="absolute -bottom-[26px] right-4 z-20 md:hidden backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl px-4 py-3 flex items-center gap-3 shadow-xl">
+                {/* Card mobile — BUG FIX (mobile perf): `backdrop-blur-xl`
+                    removed. It was continuously blurring the photo behind
+                    this card, which is one of the more expensive filters
+                    a mobile GPU can be asked to do. Swapped to a solid
+                    dark background (bg-black/60) for a similar "frosted"
+                    look at a fraction of the render cost. Desktop card
+                    below is untouched. */}
+                <div className="absolute -bottom-[26px] right-4 z-20 md:hidden bg-black/60 border border-white/10 rounded-xl px-4 py-3 flex items-center gap-3 shadow-xl">
                   <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-sm font-bold shrink-0">
                     {"</>"}
                   </div>
@@ -96,7 +102,7 @@ export default function About() {
                 </div>
               </div>
 
-              {/* Card desktop */}
+              {/* Card desktop — TIDAK DIUBAH */}
               <div className="hidden md:flex absolute bottom-6 right-[-20px] w-full max-w-xs backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl px-5 py-4 items-center gap-4 shadow-xl">
                 <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-lg">
                   {"</>"}

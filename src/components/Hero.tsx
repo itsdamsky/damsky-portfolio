@@ -112,12 +112,16 @@ export default function Hero() {
 
           {/* Photo + overlapping stats card */}
           <div className="relative flex flex-col items-center mb-6">
-            {/* Glow - optimized for mobile.
-                Was 2 stacked blurred circles (60px + 40px) — each `blur()`
-                is its own expensive paint pass on mobile GPUs. One circle
-                with a slightly stronger color gets the same glow look for
-                roughly half the blur cost. */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[260px] h-[260px] bg-orange-500/45 blur-[50px] rounded-full z-0" />
+            {/* BUG FIX (mobile perf): was `blur-[50px]` — a CSS filter blur
+                is one of the most expensive things to paint on a mobile
+                GPU, especially sitting right at the top of the page where
+                it has to be ready for the very first frame. A
+                radial-gradient gives the same soft-glow look without any
+                blur convolution — the browser just paints a gradient. */}
+            <div
+              className="absolute top-0 left-1/2 -translate-x-1/2 w-[260px] h-[260px] rounded-full z-0"
+              style={{ background: "radial-gradient(circle, rgba(249,115,22,0.45), transparent 70%)" }}
+            />
             {/* Circle ring */}
             <div className="absolute top-6 left-1/2 -translate-x-1/2 w-[290px] h-[290px] rounded-full border-2 border-orange-500/80 shadow-[0_0_30px_rgba(255,140,0,0.6)] z-10" />
             {/* Photo */}
@@ -133,7 +137,13 @@ export default function Hero() {
             </div>
             {/* Stats card — overlap foto bagian bawah */}
             <div className="relative z-30 w-full -mt-16 px-4">
-              <div className="flex items-center rounded-2xl border border-white/10 bg-black/60 px-4 py-4 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
+              {/* BUG FIX (mobile perf): `backdrop-blur-md` forces the
+                  browser to continuously composite/blur whatever's behind
+                  this card (the glow + photo), which is expensive on
+                  mobile especially since it sits fixed at scroll time.
+                  Swapped to a solid darker background (bg-black/80) for
+                  a near-identical look without the ongoing blur cost. */}
+              <div className="flex items-center rounded-2xl border border-white/10 bg-black/80 px-4 py-4 shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
                 {/* Kiri: avatar + years */}
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                   <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-lg shrink-0">👤</div>
@@ -183,8 +193,11 @@ export default function Hero() {
               >
                 View My Work ↗
               </Link>
+              {/* BUG FIX (mobile perf): removed `backdrop-blur-md`, bumped
+                  the background opacity instead to keep the button
+                  readable over the photo/glow behind it. */}
               <a href="/files/Adam-Maulana-CV.pdf" download
-                className="flex-1 max-w-[160px] px-4 py-3 rounded-xl border border-orange-500/40 bg-black/40 backdrop-blur-md hover:bg-orange-500/10 transition text-center text-sm">
+                className="flex-1 max-w-[160px] px-4 py-3 rounded-xl border border-orange-500/40 bg-black/70 hover:bg-orange-500/10 transition text-center text-sm">
                 Download CV ↓
               </a>
             </div>
@@ -231,7 +244,7 @@ export default function Hero() {
 
       {/* ═══════════════════════════════════════════════════
           DESKTOP / TABLET LAYOUT — 100% original, hanya tampil md+
-          Sama persis seperti kode asli kamu
+          Sama persis seperti kode asli kamu — TIDAK DIUBAH
       ═══════════════════════════════════════════════════ */}
       <div className="hidden md:block">
 

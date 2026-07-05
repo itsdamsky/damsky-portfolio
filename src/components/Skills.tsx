@@ -96,7 +96,16 @@ export default function Skills() {
               <div
                 onMouseMove={handleMove}
                 onMouseLeave={handleLeave}
-                className="group relative bg-white/5 border border-white/10 rounded-2xl px-4 py-4 backdrop-blur-sm hover:border-orange-500/40 transition duration-300 cursor-pointer md:will-change-transform hover:shadow-[0_0_40px_rgba(255,115,0,0.25)]"
+                // BUG FIX (mobile perf): `backdrop-blur-sm` was applied to
+                // ALL 13 cards unconditionally. One backdrop-blur is cheap;
+                // thirteen of them stacked in a grid is a real cost on a
+                // mobile GPU, especially while scrolling past them. `isDesktop`
+                // already exists in this component (it gates the 3D tilt
+                // effect) — reusing it here means mobile gets a plain card
+                // with no blur, desktop keeps the exact same glass look.
+                className={`group relative bg-white/5 border border-white/10 rounded-2xl px-4 py-4 ${
+                  isDesktop ? "backdrop-blur-sm" : ""
+                } hover:border-orange-500/40 transition duration-300 cursor-pointer md:will-change-transform hover:shadow-[0_0_40px_rgba(255,115,0,0.25)]`}
               >
                 <div className="hidden md:block absolute inset-0 opacity-0 group-hover:opacity-100 transition blur-xl bg-orange-500/10 rounded-2xl" />
                 <div className="relative z-10 flex items-center gap-3">

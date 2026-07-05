@@ -72,7 +72,14 @@ export default function FeaturedProjects() {
                   <p className="text-sm text-neutral-400">{project.category}</p>
                   <div className="absolute right-4 bottom-4">
                     <div className="relative">
-                      <div className="absolute inset-0 bg-orange-500 blur-xl opacity-10 group-hover:opacity-30 transition rounded-full" />
+                      {/* BUG FIX (mobile perf): this glow only ever shows on
+                          `group-hover`, which mobile touch screens don't
+                          trigger the way a mouse does — it was sitting in
+                          the DOM on every phone anyway, still costing a
+                          blur layer for a hover effect that can't really
+                          be seen there. `hidden md:block` keeps it desktop
+                          -only, where hover actually happens. */}
+                      <div className="hidden md:block absolute inset-0 bg-orange-500 blur-xl opacity-10 group-hover:opacity-30 transition rounded-full" />
                       <div className="relative w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center group-hover:scale-110 transition will-change-transform hover:shadow-[0_0_40px_rgba(255,115,0,0.25)]">
                         <ArrowUpRight className="w-6 h-6 stroke-[2.5]" />
                       </div>
