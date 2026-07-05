@@ -90,7 +90,7 @@ export default function SkillsSection() {
     <section className="relative min-h-screen py-32 overflow-hidden">
       <div className="container-custom">
         <ScrollReveal>
-          <div className="mb-16">
+          <div className="mb-10">
             <p className="text-xs tracking-[3px] text-orange-500 mb-3">MY STACK</p>
             <h1 className="text-4xl md:text-5xl font-semibold text-white mb-4">Skills & Tools</h1>
             <p className="text-neutral-400 max-w-xl">

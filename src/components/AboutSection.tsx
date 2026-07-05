@@ -51,7 +51,7 @@ export default function About() {
       <div className="container-custom">
 
         {/* Header */}
-        <div className="mb-16">
+        <div className="mb-10">
           <p className="text-xs tracking-[3px] text-orange-500 mb-3">ABOUT ME</p>
           <h2 className="text-3xl md:text-4xl font-semibold text-white max-w-xl">
             Designing with purpose. <br />

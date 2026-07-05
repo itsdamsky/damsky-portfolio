@@ -87,7 +87,7 @@ export default function ContactSection() {
     <section className="relative min-h-screen py-32 overflow-hidden">
       <div className="container-custom">
         {/* Header */}
-        <div className="mb-16">
+        <div className="mb-10">
           <p className="text-xs tracking-[3px] text-orange-500 mb-3">GET IN TOUCH</p>
           <h1 className="text-4xl md:text-5xl font-semibold text-white mb-4">
             Let&apos;s work <span className="text-orange-500">together.</span>
