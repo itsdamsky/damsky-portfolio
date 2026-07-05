@@ -210,7 +210,7 @@ export default function ContactSection() {
                   disabled={status === "loading"}
                   className="w-full bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium py-3 rounded-xl transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed mt-2"
                 >
-                  {status === "loading" ? "Sending..." : "Send Message →"}
+                  {status === "loading" ? "Sending..." : "Send Message"}
                 </button>
 
                 {status === "success" && (

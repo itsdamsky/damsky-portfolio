@@ -24,7 +24,7 @@ export default function Footer() {
           rel="noopener noreferrer"
           className="relative z-[2] mt-10 inline-flex items-center justify-center px-7 py-3 rounded-xl border border-orange-500/40 bg-black/40 backdrop-blur-md hover:bg-orange-500/10 transition cursor-pointer will-change-transform hover:shadow-[0_0_40px_rgba(255,115,0,0.25)]"
         >
-          Get in touch <span className="text-orange-500 ml-1">↗</span>
+          Get in touch
         </a>
       </div>
 

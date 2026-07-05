@@ -89,14 +89,14 @@ export default function About() {
                       href="/projects"
                       className="text-sm text-white border border-white/20 px-5 py-2.5 rounded-full hover:border-orange-500 hover:text-orange-500 transition-all duration-300"
                     >
-                      View My Work ↗
+                      View My Work
                     </Link>
                 <a
                   href="/files/Adam-Maulana-CV.pdf"
                   download
                   className="text-sm text-white bg-orange-500 px-5 py-2.5 rounded-full hover:bg-orange-600 transition-all duration-300"
                 >
-                  Download CV ↓
+                  Download CV
                 </a>
               </div>
             </ScrollReveal>
@@ -165,7 +165,7 @@ export default function About() {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-xs text-orange-500 hover:text-orange-400 transition mt-3"
                 >
-                  Verify Certificate ↗
+                  Verify Certificate
                 </a>
               </div>
 

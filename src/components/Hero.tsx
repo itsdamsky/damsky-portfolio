@@ -174,7 +174,7 @@ export default function Hero() {
                 {/* Divider */}
                 <div className="w-px h-12 bg-white/10 mx-3 shrink-0" />
                 {/* Kanan: projects */}
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 pl-6">
                   <p className="text-2xl font-semibold text-white leading-none"><Counter target={10} suffix="+" startDelay={350} /></p>
                   <p className="text-xs text-gray-400 mt-1 whitespace-nowrap">Projects Completed</p>
                 </div>
@@ -210,14 +210,14 @@ export default function Hero() {
                 href="/projects"
                 className="flex-1 max-w-[160px] px-4 py-3 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg text-sm font-medium hover:scale-105 transition text-center will-change-transform"
               >
-                View My Work ↗
+                View My Work
               </Link>
               {/* BUG FIX (mobile perf): removed `backdrop-blur-md`, bumped
                   the background opacity instead to keep the button
                   readable over the photo/glow behind it. */}
               <a href="/files/Adam-Maulana-CV.pdf" download
                 className="flex-1 max-w-[160px] px-4 py-3 rounded-xl border border-orange-500/40 bg-black/70 hover:bg-orange-500/10 transition text-center text-sm">
-                Download CV ↓
+                Download CV
               </a>
             </div>
             <button
@@ -324,11 +324,11 @@ export default function Hero() {
                     href="/projects"
                     className="flex-1 max-w-[160px] px-4 py-3 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg text-sm font-medium hover:scale-105 transition text-center will-change-transform"
                   >
-                    View My Work ↗
+                    View My Work
                   </Link>
                   <a href="/files/Adam-Maulana-CV.pdf" download
                     className="w-full sm:w-auto px-6 py-3 rounded-xl border border-orange-500/40 bg-black/40 backdrop-blur-md hover:bg-orange-500/10 transition text-center">
-                    Download CV ↓
+                    Download CV
                   </a>
                 </div>
 

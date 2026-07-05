@@ -194,9 +194,9 @@ export default function Navbar() {
           href="https://wa.me/6281299491922?text=Halo%20Adam%2C%20saya%20melihat%20portfolio%20kamu%20dan%20tertarik%20untuk%20bekerja%20sama!"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm text-white"
+          className="text-sm text-orange-500"
         >
-          Let&apos;s Talk <span className="text-orange-500">↗</span>
+          Let&apos;s Talk
         </a>
       </motion.header>
 
