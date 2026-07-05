@@ -163,7 +163,7 @@ export default function ProjectsSection() {
   const filtered = activeTab === "all" ? projects : projects.filter(p => p.type === activeTab);
 
   return (
-    <section id="projects" className="relative min-h-screen py-32 overflow-hidden">
+    <section id="projects" className="relative min-h-screen py-26 overflow-hidden">
       <div className="container-custom">
         <ScrollReveal>
           <div className="mb-10">

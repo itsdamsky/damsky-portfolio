@@ -47,7 +47,7 @@ export default function About() {
   }, []);
 
   return (
-    <section id="about" className="relative py-24 pt-42 overflow-hidden">
+    <section className="relative min-h-screen py-26 overflow-hidden">
       <div className="container-custom">
 
         {/* Header */}

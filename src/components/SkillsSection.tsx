@@ -87,7 +87,7 @@ export default function SkillsSection() {
   }, []);
 
   return (
-    <section className="relative min-h-screen py-32 overflow-hidden">
+    <section className="relative min-h-screen py-26 overflow-hidden">
       <div className="container-custom">
         <ScrollReveal>
           <div className="mb-10">

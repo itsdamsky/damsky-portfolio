@@ -84,7 +84,7 @@ export default function ContactSection() {
     ];
 
   return (
-    <section className="relative min-h-screen py-32 overflow-hidden">
+    <section className="relative min-h-screen py-26 overflow-hidden">
       <div className="container-custom">
         {/* Header */}
         <div className="mb-10">
