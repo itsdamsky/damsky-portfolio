@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import MouseLight from "@/components/MouseLight";
@@ -6,8 +6,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SmoothScroll from "@/components/SmoothScroll";
 import PageLoader from "@/components/PageLoader";
-import TopLoader from "@/components/TopLoader";       // ← tambah
-import PageWrapper from "@/components/PageWrapper";   // ← tambah
+import TopLoader from "@/components/TopLoader";
+import PageWrapper from "@/components/PageWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,7 +22,17 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Adam Maulana — Portfolio",
   description: "Personal portfolio website",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=5",
+};
+
+// BUG FIX: `viewport` dan `colorScheme` sebelumnya ada di dalam `metadata`,
+// tapi Next.js versi ini sudah memisahkannya ke export `viewport` sendiri.
+// Naruh keduanya di `metadata` masih "jalan" tapi memicu warning di setiap
+// build ("Unsupported metadata viewport/colorScheme is configured in
+// metadata export ..."). Dipindah ke sini supaya buildnya bersih.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
   colorScheme: "dark",
 };
 
@@ -41,7 +51,7 @@ export default function RootLayout({
       </head>
       <body className="bg-black text-white relative">
 
-        <TopLoader />       {/* ← tambah di sini */}
+        <TopLoader />
         <PageLoader />
         <SmoothScroll />
 
@@ -53,7 +63,7 @@ export default function RootLayout({
           <Navbar />
 
           <main className="flex-1">
-            <PageWrapper>   {/* ← wrap children */}
+            <PageWrapper>
               {children}
             </PageWrapper>
           </main>
