@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import ScrollReveal from "@/components/ScrollReveal";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 const categories = [
   {
@@ -42,11 +42,18 @@ const categories = [
   },
 ];
 
+// Batas atas untuk delay per-item. Sebelumnya `i * 0.08` naik terus tanpa
+// batas — kategori dengan 6 skill (Frontend Dev) bikin item terakhir baru
+// mulai animasi 0.48s setelah yang pertama. Di-cap supaya total waktu
+// "penuh" halaman tetap konsisten cepat berapa pun jumlah item-nya.
+const MAX_STAGGER_DELAY = 0.18;
+const staggerDelay = (i: number, step: number) => Math.min(i * step, MAX_STAGGER_DELAY);
+
 function SkillBar({ level, accent, show }: { level: number; accent: string; show: boolean }) {
   return (
     <div className="w-full h-[3px] bg-white/10 rounded-full overflow-hidden">
       <div
-        className={`h-full ${accent} rounded-full transition-all duration-1000 ease-out`}
+        className={`h-full ${accent} rounded-full transition-all duration-700 ease-out`}
         style={{ width: show ? `${level}%` : "0%" }}
       />
     </div>
@@ -58,10 +65,13 @@ export default function SkillsSection() {
   const [show, setShow] = useState(false);
   const [activeCategory, setActiveCategory] = useState(0);
 
+  // BUG FIX: sebelumnya setShow(false) lalu setTimeout(..., 50) baru
+  // setShow(true) — itu artinya tiap ganti kategori, skill bar sempat
+  // "kosong" selama 50ms sebelum animasi mulai, di atas delay stagger
+  // yang sudah ada. Reset + restart animasi CSS bisa dipicu langsung
+  // tanpa jeda timer tambahan (key di bawah yang memaksa re-mount).
   const handleCategoryChange = (i: number) => {
     setActiveCategory(i);
-    setShow(false);
-    setTimeout(() => setShow(true), 50);
   };
 
   useEffect(() => {
@@ -88,7 +98,7 @@ export default function SkillsSection() {
           </div>
         </ScrollReveal>
 
-        <ScrollReveal delay={0.1}>
+        <ScrollReveal delay={0.06}>
           <div className="flex gap-2 mb-12 flex-wrap">
             {categories.map((cat, i) => (
               <button
@@ -106,61 +116,58 @@ export default function SkillsSection() {
           </div>
         </ScrollReveal>
 
+        {/* AnimatePresence dihapus — motion.div di bawah tidak punya prop
+            `exit`, jadi AnimatePresence tidak benar-benar melakukan apa-apa
+            di sini selain menambah overhead JS di setiap render. `key`
+            pada grid tetap memaksa re-mount + restart animasi saat kategori
+            berganti, itu cukup. */}
         <div ref={ref}>
-          <AnimatePresence mode="wait">
-            <div key={activeCategory} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {categories[activeCategory].skills.map((skill, i) => (
-                <motion.div
-                  key={skill.name}
-                  // NOTE: was animating `filter: blur()` here. Animating CSS
-                  // filter forces the browser to repaint every frame instead
-                  // of just moving a GPU layer — that's what made this page
-                  // feel laggy on phones. opacity + y (transform) achieves a
-                  // near-identical "fade & rise in" look while staying fully
-                  // compositor-driven.
-                  initial={{ opacity: 0, y: 32 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.4,
-                    delay: i * 0.08,
-                    ease: [0.25, 0.1, 0.25, 1],
-                  }}
-                >
-                  <div className="group relative bg-white/5 border border-white/10 rounded-2xl p-5 hover:border-orange-500/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(255,115,0,0.08)]">
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-orange-500/5 to-transparent rounded-2xl pointer-events-none" />
-                    <div className="relative z-10 flex items-center gap-4 mb-4">
-                      <div className="w-10 h-10 flex items-center justify-center shrink-0 bg-white/5 rounded-xl border border-white/10">
-                        {"github" in skill && skill.github ? (
-                          <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
-                          </svg>
-                        ) : (
-                          <Image
-                            src={skill.icon}
-                            alt={skill.name}
-                            width={24}
-                            height={24}
-                            className={`w-6 h-6 object-contain ${"invert" in skill && skill.invert ? "brightness-0 invert" : ""}`}
-                          />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <p className="text-sm text-white font-medium">{skill.name}</p>
-                          <p className="text-xs text-neutral-500">{skill.level}%</p>
-                        </div>
-                        <SkillBar
-                          level={skill.level}
-                          accent={categories[activeCategory].accent}
-                          show={show}
+          <div key={activeCategory} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {categories[activeCategory].skills.map((skill, i) => (
+              <motion.div
+                key={skill.name}
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.28,
+                  delay: staggerDelay(i, 0.05),
+                  ease: [0.25, 0.1, 0.25, 1],
+                }}
+              >
+                <div className="group relative bg-white/5 border border-white/10 rounded-2xl p-5 hover:border-orange-500/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(255,115,0,0.08)]">
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-orange-500/5 to-transparent rounded-2xl pointer-events-none" />
+                  <div className="relative z-10 flex items-center gap-4 mb-4">
+                    <div className="w-10 h-10 flex items-center justify-center shrink-0 bg-white/5 rounded-xl border border-white/10">
+                      {"github" in skill && skill.github ? (
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
+                        </svg>
+                      ) : (
+                        <Image
+                          src={skill.icon}
+                          alt={skill.name}
+                          width={24}
+                          height={24}
+                          className={`w-6 h-6 object-contain ${"invert" in skill && skill.invert ? "brightness-0 invert" : ""}`}
                         />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-sm text-white font-medium">{skill.name}</p>
+                        <p className="text-xs text-neutral-500">{skill.level}%</p>
                       </div>
+                      <SkillBar
+                        level={skill.level}
+                        accent={categories[activeCategory].accent}
+                        show={show}
+                      />
                     </div>
                   </div>
-                </motion.div>
-              ))}
-            </div>
-          </AnimatePresence>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
 
         <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -170,7 +177,7 @@ export default function SkillsSection() {
             { value: "10+", label: "Tools Mastered" },
             { value: "4", label: "Projects Shipped" },
           ].map((stat, i) => (
-            <ScrollReveal key={i} delay={i * 0.08}>
+            <ScrollReveal key={i} delay={staggerDelay(i, 0.05)}>
               <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-5 text-center hover:border-orange-500/30 transition-all duration-300">
                 <p className="text-2xl font-bold text-orange-500 mb-1">{stat.value}</p>
                 <p className="text-xs text-neutral-400">{stat.label}</p>

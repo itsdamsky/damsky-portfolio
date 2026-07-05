@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useLayoutEffect } from "react";
 
 // Was framer-motion's AnimatePresence + motion.div here. That's a JS
 // library doing per-frame math on the main thread for every single route
@@ -21,6 +22,26 @@ import { usePathname } from "next/navigation";
 // on a real tap rather than a lingering crossfade.
 export default function PageWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+
+  // BUG FIX: navigating away while scrolled far down (e.g. reading the
+  // Skills page near the Footer) left the browser's scroll position
+  // untouched. Footer lives outside this wrapper (rendered once in the
+  // root layout), so it stays on screen across the swap — but the new
+  // page's own content is much shorter, so the browser just clamps the
+  // scroll to whatever's now at that old offset. That's the "blank,
+  // then content pops back in" flash: it's not missing content, it's
+  // sitting at the wrong scroll position for a split second before
+  // anything corrects it.
+  //
+  // useLayoutEffect (not useEffect) so this runs synchronously right
+  // after the new page's DOM is committed, before the browser paints —
+  // that's what prevents the one-frame flash of the wrong scroll spot.
+  // behavior: "instant" (not "smooth") on purpose: an animated scroll
+  // here would itself look like the janky "content sliding in" people
+  // are trying to get rid of.
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior });
+  }, [pathname]);
 
   return (
     <div key={pathname} className="page-transition">
