@@ -240,9 +240,13 @@ export default function Navbar() {
           // undertone oranye gelap supaya nyambung ke aksen warna oranye
           // di seluruh situs, tapi tetap gelap dan menyatu ke background
           // page yang hitam pekat.
-          surfaceColor="rgba(26, 18, 13, 0.95)"
+          // Eksperimen: bar jadi oranye pekat, ikon menu tidak aktif jadi
+          // putih. Catatan: lingkaran aktif juga oranye (gradient), jadi
+          // ada kemungkinan kontrasnya berkurang — kalau kelihatan terlalu
+          // menyatu, kita bisa sesuaikan lagi.
+          surfaceColor="#2a2e3d"
           borderColor="rgba(255,255,255,0.08)"
-          iconColorInactive="rgba(255,255,255,0.4)"
+          iconColorInactive="rgba(255,255,255,0.85)"
           iconColorActive="#ff9142"
           beamColor="#ff9142"
           accentFrom="#ff9142"

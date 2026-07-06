@@ -201,7 +201,7 @@ export default function SpotlightBottomNav({
       <div
         className="absolute pointer-events-none"
         style={{
-          top: BAR_H - 30,
+          top: BAR_H - 34,
           left: 0,
           transform: `translateX(${targetCenter}px) translateX(-50%)`,
           transition: transitionStyle,
