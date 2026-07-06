@@ -84,6 +84,17 @@ export default function ContactSection() {
     },
     ];
 
+  // BUG FIX: input/textarea sebelumnya pakai `text-sm` (14px). Di mobile
+  // Safari & Chrome, kalau ukuran font elemen form yang di-fokus lebih
+  // kecil dari 16px, browser otomatis nge-zoom ke elemen itu supaya
+  // teksnya kebaca — dan zoom itu sering nggak balik sempurna pas
+  // keluar/batal, bikin halaman kelihatan "kezoom" dan bisa digeser
+  // kiri-kanan. `text-base` (16px) di mobile menghindari trigger auto-zoom
+  // itu sama sekali; `md:text-sm` mengembalikan ukuran semula di desktop
+  // supaya tampilannya tidak berubah di sana.
+  const inputClass =
+    "bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-base md:text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-orange-500/50 transition-all duration-300";
+
   return (
     <section className="relative min-h-screen py-26 overflow-hidden">
       <div className="container-custom">
@@ -168,7 +179,7 @@ export default function ContactSection() {
                     name="from_name"
                     required
                     placeholder="John Doe"
-                    className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-orange-500/50 transition-all duration-300"
+                    className={inputClass}
                   />
                 </div>
 
@@ -179,7 +190,7 @@ export default function ContactSection() {
                     name="from_email"
                     required
                     placeholder="john@example.com"
-                    className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-orange-500/50 transition-all duration-300"
+                    className={inputClass}
                   />
                 </div>
 
@@ -190,7 +201,7 @@ export default function ContactSection() {
                     name="subject"
                     required
                     placeholder="Project collaboration"
-                    className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-orange-500/50 transition-all duration-300"
+                    className={inputClass}
                   />
                 </div>
 
@@ -201,7 +212,7 @@ export default function ContactSection() {
                     required
                     rows={5}
                     placeholder="Tell me about your project..."
-                    className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-orange-500/50 transition-all duration-300 resize-none"
+                    className={`${inputClass} resize-none`}
                   />
                 </div>
 

@@ -2,11 +2,18 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 export default function Footer() {
+  const pathname = usePathname();
+  // Transparan (grid overlay dari layout.tsx kelihatan tembus) khusus di
+  // Beranda, seperti sebelumnya sebelum di-fix. Solid (bg-black) di
+  // halaman lain supaya gak ada garis grid yang nembus di sana.
+  const isHome = pathname === "/";
+
   return (
-    <footer className="will-change-transform relative mt-2 overflow-hidden border-t border-white/5">
-      <div className="relative pt-20 pb-16 text-center overflow-hidden">
+    <footer className="will-change-transform relative overflow-hidden">
+      <div className={`relative pt-20 pb-16 text-center overflow-hidden ${isHome ? "" : "bg-black"}`}>
         <div className="absolute bottom-[-170px] left-1/2 -translate-x-1/2 w-[1000px] h-[190px] bg-[radial-gradient(ellipse_at_center,rgba(255,95,0,0.95)_60%,rgba(255,95,0,0.55)_65%,rgba(255,95,0,0.20)_85%,transparent_100%)] blur-[60px] pointer-events-none" />
 
         <p className="relative z-[2] text-[11px] tracking-[4px] text-orange-600 mb-6">
@@ -55,11 +62,11 @@ export default function Footer() {
           <div>
             <p className="text-orange-500 text-xs tracking-[3px] mb-6">LINKS</p>
             <div className="flex flex-col gap-4 text-sm text-gray-400">
-              <a href="/">Home</a>
-              <a href="/about">About</a>
-              <a href="/projects">Projects</a>
-              <a href="/skills">Skills</a>
-              <a href="/contact">Contact</a>
+              <a href="/" className="w-fit hover:text-orange-500 hover:pl-2 transition-all duration-300 ease-in-out">Home</a>
+              <a href="/about" className="w-fit hover:text-orange-500 hover:pl-2 transition-all duration-300 ease-in-out">About</a>
+              <a href="/projects" className="w-fit hover:text-orange-500 hover:pl-2 transition-all duration-300 ease-in-out">Projects</a>
+              <a href="/skills" className="w-fit hover:text-orange-500 hover:pl-2 transition-all duration-300 ease-in-out">Skills</a>
+              <a href="/contact" className="w-fit hover:text-orange-500 hover:pl-2 transition-all duration-300 ease-in-out">Contact</a>
             </div>
           </div>
 
