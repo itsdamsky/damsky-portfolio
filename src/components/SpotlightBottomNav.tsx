@@ -215,7 +215,7 @@ export default function SpotlightBottomNav({
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 24 }}
             className="text-[11px] font-medium inline-block"
-            style={{ color: iconColorActive }}
+            style={{ color: "#ffffff" }}
           >
             {items[activeIndex].label}
           </motion.span>
