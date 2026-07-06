@@ -194,9 +194,9 @@ export default function Navbar() {
           href="https://wa.me/6281299491922?text=Halo%20Adam%2C%20saya%20melihat%20portfolio%20kamu%20dan%20tertarik%20untuk%20bekerja%20sama!"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm text-orange-500"
+          className="text-sm text-white"
         >
-          Let&apos;s Talk
+          Let&apos;s Talk <span className="text-orange-500">↗</span>
         </a>
       </motion.header>
 
@@ -236,7 +236,11 @@ export default function Navbar() {
               router.push(item.href);
             }
           }}
-          surfaceColor="rgba(42,42,48,0.92)"
+          // Diganti dari abu-abu netral ke hitam kehangatan — ada sedikit
+          // undertone oranye gelap supaya nyambung ke aksen warna oranye
+          // di seluruh situs, tapi tetap gelap dan menyatu ke background
+          // page yang hitam pekat.
+          surfaceColor="rgba(26, 18, 13, 0.95)"
           borderColor="rgba(255,255,255,0.08)"
           iconColorInactive="rgba(255,255,255,0.4)"
           iconColorActive="#ff9142"

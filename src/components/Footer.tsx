@@ -133,7 +133,7 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-white/10 bg-black pt-2">
+      <div className="border-t border-white/10 bg-black pt-2 pb-24 md:pb-2">
         <div className="container-custom py-6 flex items-center justify-center text-xs text-gray-500">
           <p>© 2026 Adam Maulana. All rights reserved.</p>
         </div>
