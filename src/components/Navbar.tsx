@@ -244,8 +244,11 @@ export default function Navbar() {
           // putih. Catatan: lingkaran aktif juga oranye (gradient), jadi
           // ada kemungkinan kontrasnya berkurang — kalau kelihatan terlalu
           // menyatu, kita bisa sesuaikan lagi.
-          surfaceColor="#2a2e3d"
-          borderColor="rgba(255,255,255,0.08)"
+          // Blur + transparan, senada sama navbar desktop pas di-scroll
+          // (bg-black/60 backdrop-blur-md).
+          // Disamakan persis dengan bg-black/60 di navbar desktop scrolled.
+          surfaceColor="#030A19e9"
+          borderColor="rgba(255,255,255,0.1)"
           iconColorInactive="rgba(255,255,255,0.85)"
           iconColorActive="#ff9142"
           beamColor="#ff9142"
